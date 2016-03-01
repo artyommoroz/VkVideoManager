@@ -6,14 +6,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.frost.vkvideomanager.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
-import com.example.frost.vkvideomanager.adapters.PostAdapter;
+import com.example.frost.vkvideomanager.adapters.FeedAdapter;
 import com.example.frost.vkvideomanager.network.Parser;
-import com.example.frost.vkvideomanager.pojo.NewsFeed;
+import com.example.frost.vkvideomanager.pojo.FeedVideo;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
@@ -22,15 +24,22 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
+import org.json.JSONException;
+
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class FeedFragment extends Fragment implements PostAdapter.ItemClickListener {
+public class FeedFragment extends Fragment implements FeedAdapter.ItemClickListener {
 
     @Bind(R.id.recyclerViewVideo)
     RecyclerView recyclerView;
-    NewsFeed newsFeed;
     private OnFeedVideoSelectedListener feedVideoSelectedListener;
+    private List<FeedVideo> feedVideoList;
+    private FeedAdapter feedAdapter;
+    private String startFrom;
+    private String startFromFirst;
 
     public FeedFragment() {
         // Required empty public constructor
@@ -52,25 +61,58 @@ public class FeedFragment extends Fragment implements PostAdapter.ItemClickListe
         ButterKnife.bind(this, view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                VKRequest feedRequest = new VKRequest("newsfeed.get", VKParameters.from(
+                        VKApiConst.FILTERS, "post",
+                        VKApiConst.COUNT, 90,
+                        "start_from", startFrom
+                ));
+                feedRequest.executeWithListener(new VKRequest.VKRequestListener() {
+                    @Override
+                    public void onComplete(VKResponse response) {
+                        super.onComplete(response);
+                        try {
+                            startFrom = response.json.optJSONObject("response").getString("next_from");
+                            Log.d("FeedStart", startFrom);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (!startFrom.equals(startFromFirst)) {
+                            feedVideoList.addAll(Parser.parseNewsFeed(response));
+                            Log.d("FeedVideoListSize", String.valueOf(feedVideoList.size()));
+                            int curSize = feedAdapter.getItemCount();
+                            feedAdapter.notifyItemRangeInserted(curSize, feedVideoList.size() - 1);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         VKRequest feedRequest = new VKRequest("newsfeed.get", VKParameters.from(
                 VKApiConst.FILTERS, "post",
-//                VKApiConst.COUNT, "20"
-                "start_time", "1455643800",
-                "end_time", "1455650100"
+                VKApiConst.COUNT, 90
         ));
         feedRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                NewsFeed newsFeed = Parser.parseNewsFeed(response);
-                PostAdapter recyclerAdapter = new PostAdapter(getActivity(), newsFeed, FeedFragment.this);
-                recyclerView.setAdapter(recyclerAdapter);
+                try {
+                    startFromFirst = response.json.optJSONObject("response").getString("next_from");
+                    startFrom = response.json.optJSONObject("response").getString("next_from");
+                    Log.d("FeedStartFirst", startFromFirst);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                feedVideoList = Parser.parseNewsFeed(response);
+                Log.d("FeedVideoListSize", String.valueOf(feedVideoList.size()));
+                feedAdapter = new FeedAdapter(getActivity(), feedVideoList, FeedFragment.this);
+                recyclerView.setAdapter(feedAdapter);
             }
         });
     }
@@ -81,9 +123,6 @@ public class FeedFragment extends Fragment implements PostAdapter.ItemClickListe
         super.onAttach(activity);
         if (activity instanceof OnFeedVideoSelectedListener) {
             feedVideoSelectedListener = (OnFeedVideoSelectedListener) activity;
-        } else {
-            throw new RuntimeException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -96,13 +135,11 @@ public class FeedFragment extends Fragment implements PostAdapter.ItemClickListe
     @Override
     public void itemClicked(View v, int position) {
         if (feedVideoSelectedListener != null) {
-
             VKRequest videoRequest =  VKApi.video().get(VKParameters.from("videos",
-                            newsFeed.getVideoList().get(position).owner_id + "_"
-                                    + newsFeed.getVideoList().get(position).id + "_"
-                                    + newsFeed.getVideoList().get(position).access_key)
+                            feedVideoList.get(position).getVkApiVideo().owner_id + "_"
+                                    + feedVideoList.get(position).getVkApiVideo().id + "_"
+                                    + feedVideoList.get(position).getVkApiVideo().access_key)
             );
-
             videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
                 @Override
                 public void onComplete(VKResponse response) {

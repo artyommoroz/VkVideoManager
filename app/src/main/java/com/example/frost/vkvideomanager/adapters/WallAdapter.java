@@ -2,6 +2,7 @@ package com.example.frost.vkvideomanager.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,46 +10,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.frost.vkvideomanager.R;
-import com.example.frost.vkvideomanager.pojo.FeedPost;
-import com.example.frost.vkvideomanager.pojo.NewsFeed;
-import com.example.frost.vkvideomanager.pojo.Wall;
+import com.example.frost.vkvideomanager.pojo.WallVideo;
 import com.example.frost.vkvideomanager.utils.CircleTransform;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.model.VKApiCommunity;
-import com.vk.sdk.api.model.VKApiPost;
 import com.vk.sdk.api.model.VKApiUser;
-import com.vk.sdk.api.model.VKApiVideo;
-import com.vk.sdk.api.model.VKList;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.NewsFeedViewHolder> {
+public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHolder> {
 
-    VKList<VKApiPost> wallPostList;
-    List<FeedPost> feedPostList;
-    VKList<VKApiVideo> videoList;
-    Map<Integer, Object> owners;
-    Context context;
-    ItemClickListener itemClickListener;
+    private List<WallVideo> wallVideoList = new ArrayList<>();
+    private Context context;
+    private ItemClickListener itemClickListener;
 
-    public PostAdapter(Context context, NewsFeed newsFeed, ItemClickListener itemClickListener) {
+    public WallAdapter(Context context, List<WallVideo> wallVideoList, ItemClickListener itemClickListener) {
         this.context = context;
-        feedPostList = newsFeed.getFeedPostList();
-        videoList = newsFeed.getVideoList();
-        owners = newsFeed.getOwners();
-        this.itemClickListener = itemClickListener;
-    }
-
-    public PostAdapter(Context context, Wall wall, ItemClickListener itemClickListener) {
-        this.context = context;
-        wallPostList = wall.getWallPostList();
-        videoList = wall.getVideoList();
-        owners = wall.getOwners();
+        this.wallVideoList = wallVideoList;
         this.itemClickListener = itemClickListener;
     }
 
@@ -60,25 +43,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.NewsFeedViewHo
 
     @Override
     public void onBindViewHolder(NewsFeedViewHolder holder, int position) {
-        if (owners.get(position) instanceof VKApiCommunity) {
-            VKApiCommunity vkApiCommunity = (VKApiCommunity) owners.get(position);
+        Log.d("ParserOwnersAdapter", String.valueOf(wallVideoList.size()));
+        if (wallVideoList.get(position).getFlag().equals("community")) {
+            VKApiCommunity vkApiCommunity = wallVideoList.get(position).getVkApiCommunity();
             holder.name.setText(vkApiCommunity.name);
             Picasso.with(context).load(vkApiCommunity.photo_100).fit().centerCrop()
                     .transform(new CircleTransform()).into(holder.avatar);
-        } else if (owners.get(position) instanceof VKApiUser) {
-            VKApiUser vkApiUser = (VKApiUser) owners.get(position);
+        } else if (wallVideoList.get(position).getFlag().equals("user")) {
+            VKApiUser vkApiUser = wallVideoList.get(position).getVkApiUser();
             holder.name.setText(vkApiUser.first_name + " " + vkApiUser.last_name);
             Picasso.with(context).load(vkApiUser.photo_100).fit().centerCrop()
                     .transform(new CircleTransform()).into(holder.avatar);
         }
-        holder.title.setText(videoList.get(position).title);
-        Picasso.with(context).load(videoList.get(position).photo_320).fit().centerCrop().into(holder.imageVideo);
+        holder.title.setText(wallVideoList.get(position).getVkApiVideo().title);
+        Picasso.with(context).load(wallVideoList.get(position).getVkApiVideo().photo_320)
+                .fit().centerCrop().into(holder.imageVideo);
     }
 
 
     @Override
     public int getItemCount() {
-        return videoList.size();
+        return wallVideoList.size();
     }
 
     public class NewsFeedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

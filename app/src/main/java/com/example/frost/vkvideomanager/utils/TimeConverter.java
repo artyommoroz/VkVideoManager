@@ -1,5 +1,10 @@
 package com.example.frost.vkvideomanager.utils;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 public class TimeConverter {
 
     public static String secondsToHHmmss(int seconds) {
@@ -19,4 +24,28 @@ public class TimeConverter {
         }
         return time;
     }
+
+    public static String getFormattedDate(long timeStamp) {
+//        Locale locale = new Locale("ru", "RU");
+        long timeStampMillis = timeStamp * 1000L;
+        Date date = new Date(timeStampMillis);
+        SimpleDateFormat simpleDateFormat;
+        if (System.currentTimeMillis() - timeStampMillis < 86400000) {
+            simpleDateFormat = new SimpleDateFormat(" 'сегодня в' H:mm", myDateFormatSymbols);
+        } else if (System.currentTimeMillis() - timeStampMillis > 86400000
+                && System.currentTimeMillis() - timeStampMillis < 86400000 * 2) {
+            simpleDateFormat = new SimpleDateFormat(" 'вчера в' H:mm", myDateFormatSymbols);
+        } else {
+            simpleDateFormat = new SimpleDateFormat("dd MMM 'в' H:mm", myDateFormatSymbols);
+        }
+        return simpleDateFormat.format(date);
+    }
+
+    private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
+        @Override
+        public String[] getMonths() {
+            return new String[]{"янв", "фев", "мар", "апр", "мая", "июн",
+                    "июл", "авг", "сен", "окт", "ноя", "дек"};
+        }
+    };
 }

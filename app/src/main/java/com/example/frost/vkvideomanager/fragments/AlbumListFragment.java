@@ -2,7 +2,6 @@ package com.example.frost.vkvideomanager.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.frost.vkvideomanager.pojo.Album;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.adapters.AlbumAdapter;
+import com.example.frost.vkvideomanager.pojo.Album;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
@@ -35,8 +34,8 @@ public class AlbumListFragment extends Fragment implements AlbumAdapter.ItemClic
 
     @Bind(R.id.recyclerViewAlbum)
     RecyclerView recyclerView;
-    List<Album> albumList = new ArrayList<>();
-    OnAlbumSelectedListener albumSelectedListener;
+    private List<Album> albumList = new ArrayList<>();
+    private OnAlbumSelectedListener albumSelectedListener;
 
     public AlbumListFragment() {
         // Required empty public constructor

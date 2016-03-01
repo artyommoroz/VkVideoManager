@@ -67,6 +67,18 @@
                 android:layout_below="@+id/titleAlbum"
                 android:layout_toRightOf="@+id/avatar"
                 android:layout_toEndOf="@+id/avatar" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:text="191193"
+                android:layout_marginRight="16dp"
+                android:layout_below="@+id/name"
+                android:layout_toRightOf="@+id/avatar"
+                android:layout_toEndOf="@+id/avatar" />
         </RelativeLayout>
 
         <!--<TextView-->
