@@ -6,15 +6,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.example.frost.vkvideomanager.R;
+import com.example.frost.vkvideomanager.fragments.CatalogSectionFragment;
 import com.example.frost.vkvideomanager.fragments.VideosFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class AlbumActivity extends AppCompatActivity implements VideosFragment.OnVideoSelectedListener {
+public class CatalogSectionActivity extends AppCompatActivity implements VideosFragment.OnVideoSelectedListener {
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -34,14 +36,16 @@ public class AlbumActivity extends AppCompatActivity implements VideosFragment.O
             }
         });
 
-        String albumTitle = getIntent().getStringExtra("albumTitle");
-        getSupportActionBar().setTitle(albumTitle);
+        String sectionTitle = getIntent().getStringExtra("sectionTitle");
+        getSupportActionBar().setTitle(sectionTitle);
 
-        int albumId = getIntent().getIntExtra("albumId", 13);
-        int ownerId = getIntent().getIntExtra("ownerId", 13);
-        VideosFragment videoFragment = VideosFragment.newInstance(ownerId, albumId, false);
+        String sectionId = getIntent().getStringExtra("sectionId");
+        Log.d("SectionActivityID", sectionId);
+        String from = getIntent().getStringExtra("from");
+        Log.d("SectionActivityFROM", from);
+        CatalogSectionFragment catalogSectionFragment = CatalogSectionFragment.newInstance(sectionId, from);
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.container, videoFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.container, catalogSectionFragment).commit();
     }
 
     @Override

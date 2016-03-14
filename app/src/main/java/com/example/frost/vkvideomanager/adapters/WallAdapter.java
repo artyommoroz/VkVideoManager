@@ -2,7 +2,6 @@ package com.example.frost.vkvideomanager.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.frost.vkvideomanager.R;
-import com.example.frost.vkvideomanager.pojo.WallVideo;
+import com.example.frost.vkvideomanager.model.WallVideo;
 import com.example.frost.vkvideomanager.utils.CircleTransform;
+import com.example.frost.vkvideomanager.utils.TimeConverter;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.model.VKApiCommunity;
 import com.vk.sdk.api.model.VKApiUser;
@@ -37,13 +37,12 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
 
     @Override
     public NewsFeedViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_post, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
         return new NewsFeedViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(NewsFeedViewHolder holder, int position) {
-        Log.d("ParserOwnersAdapter", String.valueOf(wallVideoList.size()));
         if (wallVideoList.get(position).getFlag().equals("community")) {
             VKApiCommunity vkApiCommunity = wallVideoList.get(position).getVkApiCommunity();
             holder.name.setText(vkApiCommunity.name);
@@ -55,6 +54,9 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
             Picasso.with(context).load(vkApiUser.photo_100).fit().centerCrop()
                     .transform(new CircleTransform()).into(holder.avatar);
         }
+        String convertedDate = TimeConverter.getFormattedDate(wallVideoList.get(position).getVkApiPost().date);
+        holder.date.setText(convertedDate);
+        holder.duration.setText(TimeConverter.secondsToHHmmss(wallVideoList.get(position).getVkApiVideo().duration));
         holder.title.setText(wallVideoList.get(position).getVkApiVideo().title);
         Picasso.with(context).load(wallVideoList.get(position).getVkApiVideo().photo_320)
                 .fit().centerCrop().into(holder.imageVideo);
@@ -68,16 +70,18 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
 
     public class NewsFeedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.titleAlbum)
+        @Bind(R.id.title)
         TextView title;
-//        @Bind(R.id.date)
-//        TextView date;
+        @Bind(R.id.date)
+        TextView date;
         @Bind(R.id.imageVideo)
         ImageView imageVideo;
-        @Bind(R.id.avatar)
+        @Bind(R.id.icon)
         ImageView avatar;
         @Bind(R.id.name)
         TextView name;
+        @Bind(R.id.duration)
+        TextView duration;
 
         public NewsFeedViewHolder(View itemView) {
             super(itemView);

@@ -1,55 +1,52 @@
 package com.example.frost.vkvideomanager.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.adapters.AlbumAdapter;
-import com.example.frost.vkvideomanager.pojo.Album;
+import com.example.frost.vkvideomanager.model.Album;
+import com.example.frost.vkvideomanager.network.Parser;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class AlbumListFragment extends Fragment implements AlbumAdapter.ItemClickListener {
+public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemClickListener {
 
-    @Bind(R.id.recyclerViewAlbum)
+    @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
-    private List<Album> albumList = new ArrayList<>();
+    @Bind(R.id.progressBar)
+    ProgressBar progressBar;
+
+    private List<Album> albumList;
     private OnAlbumSelectedListener albumSelectedListener;
 
-    public AlbumListFragment() {
+    public AlbumsFragment() {
         // Required empty public constructor
     }
 
-    public static AlbumListFragment newInstance() {
-        AlbumListFragment fragment = new AlbumListFragment();
-        return fragment;
+    public static AlbumsFragment newInstance() {
+        return new AlbumsFragment();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_album, container, false);
+        return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
@@ -63,36 +60,24 @@ public class AlbumListFragment extends Fragment implements AlbumAdapter.ItemClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setRetainInstance(true);
-
-        final VKRequest albumRequest = VKApi.video().getAlbums(VKParameters.from(VKApiConst.EXTENDED, "1"));
+//        setRetainInstance(true);
+        VKRequest albumRequest = VKApi.video().getAlbums(VKParameters.from(VKApiConst.EXTENDED, 1));
         albumRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                Log.d("ApiResponse", String.valueOf(response.json));
-                try {
-                    JSONObject resp = response.json.getJSONObject("response");
-                    JSONArray jalbums = resp.getJSONArray("items");
-                    for (int i = 0; i < jalbums.length(); i++) {
-                        albumList.add(new Album(jalbums.getJSONObject(i)));
-                    }
-                    AlbumAdapter recyclerAdapter = new AlbumAdapter(getActivity(), albumList, AlbumListFragment.this);
-                    recyclerView.setAdapter(recyclerAdapter);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                progressBar.setVisibility(View.INVISIBLE);
+                albumList = Parser.parseAlbums(response);
+                AlbumAdapter albumAdapter = new AlbumAdapter(getActivity(), albumList, AlbumsFragment.this);
+                recyclerView.setAdapter(albumAdapter);
             }
         });
     }
-
 
     @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         if (activity instanceof OnAlbumSelectedListener) {
             albumSelectedListener = (OnAlbumSelectedListener) activity;
         }
@@ -107,13 +92,18 @@ public class AlbumListFragment extends Fragment implements AlbumAdapter.ItemClic
     @Override
     public void itemClicked(View v, int position) {
         if (albumSelectedListener != null) {
+            int ownerId = albumList.get(position).getOwnerId();
             int albumId = albumList.get(position).getId();
             String albumTitle = albumList.get(position).getTitle();
-            albumSelectedListener.onAlbumSelected(albumId, albumTitle);
+            albumSelectedListener.onAlbumSelected(ownerId, albumId, albumTitle);
         }
     }
 
+    public String getName() {
+        return "ALBUMS";
+    }
+
     public interface OnAlbumSelectedListener {
-        void onAlbumSelected(int albumId, String albumTitle);
+        void onAlbumSelected(int ownerId, int albumId, String albumTitle);
     }
 }

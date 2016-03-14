@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.frost.vkvideomanager.R;
-import com.example.frost.vkvideomanager.pojo.FeedVideo;
+import com.example.frost.vkvideomanager.model.FeedVideo;
 import com.example.frost.vkvideomanager.utils.CircleTransform;
 import com.example.frost.vkvideomanager.utils.TimeConverter;
 import com.squareup.picasso.Picasso;
@@ -35,25 +35,26 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     @Override
     public FeedViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_post, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
         return new FeedViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(FeedViewHolder holder, int position) {
+        String convertedDate = TimeConverter.getFormattedDate(feedVideoList.get(position).getFeedPost().getDate());
         if (feedVideoList.get(position).getFlag().equals("community")) {
             VKApiCommunity vkApiCommunity = feedVideoList.get(position).getVkApiCommunity();
-            holder.name.setText(vkApiCommunity.name);
+            holder.name.setText(vkApiCommunity.name + " · " + convertedDate);
             Picasso.with(context).load(vkApiCommunity.photo_100).fit().centerCrop()
                     .transform(new CircleTransform()).into(holder.avatar);
         } else if (feedVideoList.get(position).getFlag().equals("user")) {
             VKApiUser vkApiUser = feedVideoList.get(position).getVkApiUser();
-            holder.name.setText(vkApiUser.first_name + " " + vkApiUser.last_name);
+            holder.name.setText(vkApiUser.first_name + " " + vkApiUser.last_name + " · " + convertedDate);
             Picasso.with(context).load(vkApiUser.photo_100).fit().centerCrop()
                     .transform(new CircleTransform()).into(holder.avatar);
         }
-        String convertedDate = TimeConverter.getFormattedDate(feedVideoList.get(position).getFeedPost().getDate());
-        holder.date.setText(convertedDate);
+//        holder.date.setText(convertedDate);
+        holder.duration.setText(TimeConverter.secondsToHHmmss(feedVideoList.get(position).getVkApiVideo().duration));
         holder.title.setText(feedVideoList.get(position).getVkApiVideo().title);
         Picasso.with(context).load(feedVideoList.get(position).getVkApiVideo().photo_320)
                 .fit().centerCrop().into(holder.imageVideo);
@@ -67,16 +68,18 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     public class FeedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.titleAlbum)
+        @Bind(R.id.title)
         TextView title;
-        @Bind(R.id.date)
-        TextView date;
+//        @Bind(R.id.date)
+//        TextView date;
         @Bind(R.id.imageVideo)
         ImageView imageVideo;
-        @Bind(R.id.avatar)
+        @Bind(R.id.icon)
         ImageView avatar;
         @Bind(R.id.name)
         TextView name;
+        @Bind(R.id.duration)
+        TextView duration;
 
         public FeedViewHolder(View itemView) {
             super(itemView);

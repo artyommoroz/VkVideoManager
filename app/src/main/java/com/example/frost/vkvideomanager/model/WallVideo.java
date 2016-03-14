@@ -1,4 +1,4 @@
-package com.example.frost.vkvideomanager.pojo;
+package com.example.frost.vkvideomanager.model;
 
 
 import com.vk.sdk.api.model.VKApiCommunity;
@@ -8,11 +8,11 @@ import com.vk.sdk.api.model.VKApiVideo;
 
 public class WallVideo {
 
-    VKApiVideo vkApiVideo;
-    VKApiPost vkApiPost;
-    VKApiUser vkApiUser;
-    VKApiCommunity vkApiCommunity;
-    String flag;
+    private VKApiVideo vkApiVideo;
+    private VKApiPost vkApiPost;
+    private VKApiUser vkApiUser;
+    private VKApiCommunity vkApiCommunity;
+    private String flag;
 
     public WallVideo(VKApiPost vkApiPost, VKApiVideo vkApiVideo, VKApiUser vkApiUser, String flag) {
         this.vkApiPost = vkApiPost;

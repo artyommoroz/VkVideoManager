@@ -10,12 +10,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.frost.vkvideomanager.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.adapters.FeedAdapter;
+import com.example.frost.vkvideomanager.adapters.FeedSectionAdapter;
+import com.example.frost.vkvideomanager.model.FeedSection;
+import com.example.frost.vkvideomanager.model.FeedVideo;
 import com.example.frost.vkvideomanager.network.Parser;
-import com.example.frost.vkvideomanager.pojo.FeedVideo;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
@@ -30,14 +33,20 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 public class FeedFragment extends Fragment implements FeedAdapter.ItemClickListener {
 
-    @Bind(R.id.recyclerViewVideo)
+    @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
+    @Bind(R.id.progressBar)
+    ProgressBar progressBar;
+
     private OnFeedVideoSelectedListener feedVideoSelectedListener;
     private List<FeedVideo> feedVideoList;
+    private List<FeedSection> feedSectionList;
     private FeedAdapter feedAdapter;
+    SectionedRecyclerViewAdapter sectionAdapter;
     private String startFrom;
     private String startFromFirst;
 
@@ -53,7 +62,7 @@ public class FeedFragment extends Fragment implements FeedAdapter.ItemClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_video, container, false);
+        return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
@@ -61,32 +70,33 @@ public class FeedFragment extends Fragment implements FeedAdapter.ItemClickListe
         ButterKnife.bind(this, view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
+//        recyclerView.addItemDecoration(new FeedItemDecoration(8));
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                VKRequest feedRequest = new VKRequest("newsfeed.get", VKParameters.from(
-                        VKApiConst.FILTERS, "post",
-                        VKApiConst.COUNT, 90,
-                        "start_from", startFrom
-                ));
-                feedRequest.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        try {
-                            startFrom = response.json.optJSONObject("response").getString("next_from");
-                            Log.d("FeedStart", startFrom);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        if (!startFrom.equals(startFromFirst)) {
-                            feedVideoList.addAll(Parser.parseNewsFeed(response));
-                            Log.d("FeedVideoListSize", String.valueOf(feedVideoList.size()));
-                            int curSize = feedAdapter.getItemCount();
-                            feedAdapter.notifyItemRangeInserted(curSize, feedVideoList.size() - 1);
-                        }
-                    }
-                });
+//                VKRequest feedRequest = new VKRequest("newsfeed.get", VKParameters.from(
+//                        VKApiConst.FILTERS, "post",
+//                        VKApiConst.COUNT, 90,
+//                        "start_from", startFrom
+//                ));
+//                feedRequest.executeWithListener(new VKRequest.VKRequestListener() {
+//                    @Override
+//                    public void onComplete(VKResponse response) {
+//                        super.onComplete(response);
+//                        try {
+//                            startFrom = response.json.optJSONObject("response").getString("next_from");
+//                            Log.d("FeedStart", startFrom);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                        if (!startFrom.equals(startFromFirst)) {
+//                            feedVideoList.addAll(Parser.parseNewsFeed(response));
+//                            Log.d("FeedVideoListSize", String.valueOf(feedVideoList.size()));
+//                            int curSize = feedAdapter.getItemCount();
+//                            feedAdapter.notifyItemRangeInserted(curSize, feedVideoList.size() - 1);
+//                        }
+//                    }
+//                });
             }
         });
     }
@@ -95,13 +105,14 @@ public class FeedFragment extends Fragment implements FeedAdapter.ItemClickListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         VKRequest feedRequest = new VKRequest("newsfeed.get", VKParameters.from(
-                VKApiConst.FILTERS, "post",
-                VKApiConst.COUNT, 90
+                VKApiConst.FILTERS, "video"
+//                VKApiConst.COUNT, 90
         ));
         feedRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
+                progressBar.setVisibility(View.INVISIBLE);
                 try {
                     startFromFirst = response.json.optJSONObject("response").getString("next_from");
                     startFrom = response.json.optJSONObject("response").getString("next_from");
@@ -109,10 +120,13 @@ public class FeedFragment extends Fragment implements FeedAdapter.ItemClickListe
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                feedVideoList = Parser.parseNewsFeed(response);
-                Log.d("FeedVideoListSize", String.valueOf(feedVideoList.size()));
-                feedAdapter = new FeedAdapter(getActivity(), feedVideoList, FeedFragment.this);
-                recyclerView.setAdapter(feedAdapter);
+                feedSectionList = Parser.parseNewsFeed(response);
+                sectionAdapter = new SectionedRecyclerViewAdapter();
+                for (int i = 0; i < feedSectionList.size(); i++) {
+                    FeedSectionAdapter feedSectionAdapter = new FeedSectionAdapter(getActivity(), feedSectionList.get(i), sectionAdapter);
+                    sectionAdapter.addSection(feedSectionAdapter);
+                }
+                recyclerView.setAdapter(sectionAdapter);
             }
         });
     }

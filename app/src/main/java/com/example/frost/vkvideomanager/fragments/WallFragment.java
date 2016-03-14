@@ -1,7 +1,6 @@
 package com.example.frost.vkvideomanager.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,12 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.frost.vkvideomanager.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.adapters.WallAdapter;
+import com.example.frost.vkvideomanager.model.WallVideo;
 import com.example.frost.vkvideomanager.network.Parser;
-import com.example.frost.vkvideomanager.pojo.WallVideo;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
@@ -30,33 +30,35 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class WallFragment extends Fragment implements WallAdapter.ItemClickListener {
+public class WallFragment extends BaseFragment implements WallAdapter.ItemClickListener {
 
-    @Bind(R.id.recyclerViewVideo)
+    @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
+    @Bind(R.id.progressBar)
+    ProgressBar progressBar;
 
     private List<WallVideo> wallVideoList;
     private int offset = 100;
     private OnWallVideoSelectedListener wallVideoSelectedListener;
     private WallAdapter wallAdapter;
+    private int ownerId;
 
     public WallFragment() {
         // Required empty public constructor
     }
 
-    public static WallFragment newInstance() {
+    public static WallFragment newInstance(int ownerId) {
         WallFragment fragment = new WallFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putInt("ownerId", ownerId);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_video, container, false);
+        return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
@@ -69,8 +71,7 @@ public class WallFragment extends Fragment implements WallAdapter.ItemClickListe
             public void onLoadMore(int page, int totalItemsCount) {
                 Log.d("WallVideoListSizeOffset", String.valueOf(offset));
                 VKRequest wallRequest = VKApi.wall().get(VKParameters.from(
-//                        VKApiConst.OWNER_ID, 4171317,
-                        VKApiConst.OWNER_ID, 37052706,
+                        VKApiConst.OWNER_ID, ownerId,
                         VKApiConst.OFFSET, offset,
                         VKApiConst.COUNT, 50,
                         VKApiConst.EXTENDED, 1));
@@ -94,24 +95,23 @@ public class WallFragment extends Fragment implements WallAdapter.ItemClickListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//        }
+
+        if (getArguments() != null) {
+            ownerId = getArguments().getInt("ownerId");
+        }
 
         VKRequest wallRequest = VKApi.wall().get(VKParameters.from(
-//                VKApiConst.OWNER_ID, 4171317,37052706
-                VKApiConst.OWNER_ID, 37052706,
+                VKApiConst.OWNER_ID, ownerId,
                 VKApiConst.COUNT, 100,
-                "filter", "all",
                 VKApiConst.EXTENDED, 1));
         wallRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
+                progressBar.setVisibility(View.INVISIBLE);
                 wallVideoList = Parser.parseWall(response);
                 wallAdapter = new WallAdapter(getActivity(), wallVideoList, WallFragment.this);
                 recyclerView.setAdapter(wallAdapter);
-                Log.d("WallVideoListSize", String.valueOf(wallVideoList.size()));
             }
         });
     }
@@ -148,6 +148,10 @@ public class WallFragment extends Fragment implements WallAdapter.ItemClickListe
                 }
             });
         }
+    }
+
+    public String getName() {
+        return "WALL";
     }
 
     public interface OnWallVideoSelectedListener {

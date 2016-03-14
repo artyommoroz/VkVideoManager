@@ -3,6 +3,7 @@ package com.example.frost.vkvideomanager.utils;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class TimeConverter {
@@ -26,17 +27,20 @@ public class TimeConverter {
     }
 
     public static String getFormattedDate(long timeStamp) {
-//        Locale locale = new Locale("ru", "RU");
+        Locale locale = new Locale("ru", "RU");
         long timeStampMillis = timeStamp * 1000L;
         Date date = new Date(timeStampMillis);
         SimpleDateFormat simpleDateFormat;
         if (System.currentTimeMillis() - timeStampMillis < 86400000) {
-            simpleDateFormat = new SimpleDateFormat(" 'сегодня в' H:mm", myDateFormatSymbols);
+            simpleDateFormat = new SimpleDateFormat("'сегодня в' H:mm");
         } else if (System.currentTimeMillis() - timeStampMillis > 86400000
                 && System.currentTimeMillis() - timeStampMillis < 86400000 * 2) {
-            simpleDateFormat = new SimpleDateFormat(" 'вчера в' H:mm", myDateFormatSymbols);
+            simpleDateFormat = new SimpleDateFormat("'вчера в' H:mm");
+        } else if (System.currentTimeMillis() - timeStampMillis > 864000004 * 2
+                && System.currentTimeMillis() - timeStampMillis < 31 * 86400000) {
+            simpleDateFormat = new SimpleDateFormat("dd MMM y", locale);
         } else {
-            simpleDateFormat = new SimpleDateFormat("dd MMM 'в' H:mm", myDateFormatSymbols);
+            simpleDateFormat = new SimpleDateFormat("dd MMM 'в' H:mm", locale);
         }
         return simpleDateFormat.format(date);
     }

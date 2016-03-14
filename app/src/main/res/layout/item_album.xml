@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="image"
-            android:src="@drawable/ic_more_vert_black_24dp"/>
+            />
 
         <ImageView
             android:id="@+id/privacy"
@@ -54,20 +54,20 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/titleAlbum"
+        android:id="@+id/title"
         android:paddingLeft="16dp"
         android:text="HELLO WHAT THE FUCK"
         android:maxLines="2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
         android:textSize="14sp"
         android:layout_weight="0.99" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_more_vert_black_24dp"
+        android:src="@drawable/ic_more_vert_grey_500_24dp"
         android:background="@android:color/transparent"
-        android:id="@+id/imageButton" />
+        android:id="@+id/imageButton"
+        />
 </LinearLayout>

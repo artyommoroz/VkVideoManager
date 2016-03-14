@@ -1,4 +1,4 @@
-package com.example.frost.vkvideomanager.pojo;
+package com.example.frost.vkvideomanager.model;
 
 import com.vk.sdk.api.model.VKApiCommunity;
 import com.vk.sdk.api.model.VKApiUser;
