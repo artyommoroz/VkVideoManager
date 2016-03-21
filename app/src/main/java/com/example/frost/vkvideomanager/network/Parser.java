@@ -2,10 +2,10 @@ package com.example.frost.vkvideomanager.network;
 
 import android.util.Log;
 
-import com.example.frost.vkvideomanager.model.Album;
-import com.example.frost.vkvideomanager.model.CatalogSection;
-import com.example.frost.vkvideomanager.model.FeedSection;
-import com.example.frost.vkvideomanager.model.WallVideo;
+import com.example.frost.vkvideomanager.album.Album;
+import com.example.frost.vkvideomanager.catalog.CatalogSection;
+import com.example.frost.vkvideomanager.feed.FeedSection;
+import com.example.frost.vkvideomanager.wall.WallVideo;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiCommunity;
 import com.vk.sdk.api.model.VKApiPost;
@@ -43,11 +43,13 @@ public class Parser {
     public static List<Album> parseAlbums(VKResponse response) {
         List<Album> albumList = new ArrayList<>();
         JSONObject response1 = response.json.optJSONObject("response");
-        JSONArray jitems = response1.optJSONArray("items");
-        for (int i = 0; i < jitems.length(); i++) {
+        JSONArray jAlbums = response1.optJSONArray("items");
+        for (int i = 0; i < jAlbums.length(); i++) {
             Album album = null;
             try {
-                album = new Album(jitems.getJSONObject(i));
+                JSONObject jAlbum = jAlbums.getJSONObject(i);
+                album = new Album(jAlbum);
+                album.setPrivacy(jAlbum.optJSONObject("privacy").optString("type"));
             } catch (JSONException e) {
                 e.printStackTrace();
             };
@@ -63,36 +65,34 @@ public class Parser {
         VKList<VKApiCommunity> communityList = new VKList<>();
         List<WallVideo> wallVideoList = new ArrayList<>();
 
-        JSONObject response1 = response.json.optJSONObject("response");
+        JSONObject jResponse = response.json.optJSONObject("response");
 
-        JSONArray jprofiles = response1.optJSONArray("profiles");
-        for (int i = 0; i < jprofiles.length(); i++) {
-            JSONObject jprofile =  jprofiles.optJSONObject(i);
+        JSONArray jProfiles = jResponse.optJSONArray("profiles");
+        for (int i = 0; i < jProfiles.length(); i++) {
+            JSONObject jprofile =  jProfiles.optJSONObject(i);
             try {
-                VKApiUser profile = new VKApiUser(jprofile);
-                profileList.add(profile);
+                profileList.add(new VKApiUser(jprofile));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        JSONArray jcommunties = response1.optJSONArray("groups");
-        for (int i = 0; i < jcommunties.length(); i++) {
-            JSONObject jcommunity =  jcommunties.optJSONObject(i);
-            VKApiCommunity community = new VKApiCommunity(jcommunity);
-            communityList.add(community);
+        JSONArray jCommunities = jResponse.optJSONArray("groups");
+        for (int i = 0; i < jCommunities.length(); i++) {
+            JSONObject jCommunity =  jCommunities.optJSONObject(i);
+            communityList.add(new VKApiCommunity(jCommunity));
         }
 
-        JSONArray jItems = response1.optJSONArray("items");
-        for(int i = 0; i < jItems.length(); i++) {
+        JSONArray jPosts = jResponse.optJSONArray("items");
+        for(int i = 0; i < jPosts.length(); i++) {
             VKApiPost wallPost = null;
             try {
-                wallPost = new VKApiPost(jItems.optJSONObject(i));
+                wallPost = new VKApiPost(jPosts.optJSONObject(i));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            JSONArray jReposts = jItems.optJSONObject(i).optJSONArray("copy_history");
+            JSONArray jReposts = jPosts.optJSONObject(i).optJSONArray("copy_history");
             if (jReposts != null) {
                 for (int z = 0; z < jReposts.length(); z++) {
                     VKApiPost repost = null;
@@ -122,20 +122,22 @@ public class Parser {
             }
         }
 
-        for (int n = 0; n < wallPostList.size(); n++) {
-            if (wallPostList.get(n).id < 0) {
-                for (int m = 0; m < communityList.size(); m++) {
-                    if (wallPostList.get(n).from_id == -1 * communityList.get(m).id) {
-                        WallVideo wallVideo = new WallVideo(wallPostList.get(n), videoList.get(n),
-                                communityList.get(m), "community");
+        for (int i = 0; i < wallPostList.size(); i++) {
+            int fromId = wallPostList.get(i).from_id;
+            if (fromId < 0) {
+                for (int j = 0; j < communityList.size(); j++) {
+                    if (fromId == -1 * communityList.get(j).id) {
+                        WallVideo wallVideo = new WallVideo(videoList.get(i), communityList.get(j).name,
+                                communityList.get(j).photo_100, wallPostList.get(i).date, wallPostList.get(i).id);
                         wallVideoList.add(wallVideo);
                     }
                 }
             } else {
-                for (int m = 0; m < profileList.size(); m++) {
-                    if (wallPostList.get(n).from_id == profileList.get(m).id) {
-                        WallVideo wallVideo = new WallVideo(wallPostList.get(n), videoList.get(n),
-                                profileList.get(m), "user");
+                for (int j = 0; j < profileList.size(); j++) {
+                    if (fromId == profileList.get(j).id) {
+                        WallVideo wallVideo = new WallVideo(videoList.get(i), profileList.get(j).first_name + " "
+                                + profileList.get(j).last_name, profileList.get(j).photo_100,
+                                wallPostList.get(i).date, wallPostList.get(i).id);
                         wallVideoList.add(wallVideo);
                     }
                 }

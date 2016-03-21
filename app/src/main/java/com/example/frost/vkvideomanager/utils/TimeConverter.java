@@ -1,6 +1,7 @@
 package com.example.frost.vkvideomanager.utils;
 
 import java.text.DateFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -43,6 +44,22 @@ public class TimeConverter {
             simpleDateFormat = new SimpleDateFormat("dd MMM 'в' H:mm", locale);
         }
         return simpleDateFormat.format(date);
+    }
+
+    public static String getViewsWithRightEnding(int viewsNumber) {
+        String textNumber = String.valueOf(viewsNumber);
+        String ending = "";
+        if (textNumber.endsWith("2") || textNumber.endsWith("3") || textNumber.endsWith("4")) {
+            ending = "a";
+        } else if (textNumber.endsWith("5") || textNumber.endsWith("6") || textNumber.endsWith("7") ||
+                textNumber.endsWith("8") || textNumber.endsWith("9") || textNumber.endsWith("0") ||
+                textNumber.endsWith("11") || textNumber.endsWith("12") || textNumber.endsWith("13") ||
+                textNumber.endsWith("14")) {
+            ending = "ов";
+        }
+//        DecimalFormat formatter = new DecimalFormat("' '###");
+        return NumberFormat.getNumberInstance(Locale.FRENCH).format(viewsNumber) + " " + "просмотр" + ending;
+//        return formatter.format(viewsNumber) + " " + "просмотр" + ending;
     }
 
     private static DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
