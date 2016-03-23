@@ -26,8 +26,9 @@ public class Parser {
 
     public static VKList<VKApiVideo> parseVideos(VKResponse response) {
         VKList<VKApiVideo> videoList = new VKList<>();
-        JSONObject response1 = response.json.optJSONObject("response");
-        JSONArray jVideos = response1.optJSONArray("items");
+
+        JSONObject jResponse = response.json.optJSONObject("response");
+        JSONArray jVideos = jResponse.optJSONArray("items");
         for (int i = 0; i < jVideos.length(); i++) {
             try {
                 VKApiVideo vkApiVideo = new VKApiVideo(jVideos.optJSONObject(i));
@@ -36,20 +37,23 @@ public class Parser {
                 e.printStackTrace();
             }
         }
-
         return videoList;
     }
 
     public static List<Album> parseAlbums(VKResponse response) {
         List<Album> albumList = new ArrayList<>();
-        JSONObject response1 = response.json.optJSONObject("response");
-        JSONArray jAlbums = response1.optJSONArray("items");
+
+        JSONObject jResponse = response.json.optJSONObject("response");
+        JSONArray jAlbums = jResponse.optJSONArray("items");
         for (int i = 0; i < jAlbums.length(); i++) {
             Album album = null;
             try {
                 JSONObject jAlbum = jAlbums.getJSONObject(i);
                 album = new Album(jAlbum);
-                album.setPrivacy(jAlbum.optJSONObject("privacy").optString("type"));
+                JSONObject jPrivacy = jAlbum.optJSONObject("privacy");
+                if (jPrivacy != null) {
+                    album.setPrivacy(jPrivacy.optString("type"));
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             };
@@ -66,7 +70,6 @@ public class Parser {
         List<WallVideo> wallVideoList = new ArrayList<>();
 
         JSONObject jResponse = response.json.optJSONObject("response");
-
         JSONArray jProfiles = jResponse.optJSONArray("profiles");
         for (int i = 0; i < jProfiles.length(); i++) {
             JSONObject jprofile =  jProfiles.optJSONObject(i);
@@ -135,8 +138,8 @@ public class Parser {
             } else {
                 for (int j = 0; j < profileList.size(); j++) {
                     if (fromId == profileList.get(j).id) {
-                        WallVideo wallVideo = new WallVideo(videoList.get(i), profileList.get(j).first_name + " "
-                                + profileList.get(j).last_name, profileList.get(j).photo_100,
+                        WallVideo wallVideo = new WallVideo(videoList.get(i), profileList.get(j).first_name
+                                + " " + profileList.get(j).last_name, profileList.get(j).photo_100,
                                 wallPostList.get(i).date, wallPostList.get(i).id);
                         wallVideoList.add(wallVideo);
                     }
@@ -153,7 +156,6 @@ public class Parser {
         VKList<VKApiCommunity> communityList = new VKList<>();
 
         JSONObject jResponse = response.json.optJSONObject("response");
-
         JSONArray jProfiles = jResponse.optJSONArray("profiles");
         for (int i = 0; i < jProfiles.length(); i++) {
             JSONObject jprofile =  jProfiles.optJSONObject(i);
@@ -212,7 +214,6 @@ public class Parser {
                 }
             }
         }
-
         return feedSectionList;
     }
 
@@ -221,7 +222,6 @@ public class Parser {
         VKList<VKApiCommunity> communityList = new VKList<>();
 
         JSONObject jResponse = response.json.optJSONObject("response");
-
         JSONArray jCommunties = jResponse.optJSONArray("groups");
         for (int i = 0; i < jCommunties.length(); i++) {
             JSONObject jCommunity =  jCommunties.optJSONObject(i);
@@ -268,7 +268,6 @@ public class Parser {
                 }
             }
         }
-
         return catalogSectionList;
     }
 
@@ -290,7 +289,6 @@ public class Parser {
             videoList.add(vkApiVideo);
             Log.d("SectionFragment", String.valueOf(videoList.size()));
         }
-
         return videoList;
     }
 }

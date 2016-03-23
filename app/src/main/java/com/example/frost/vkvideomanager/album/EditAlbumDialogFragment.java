@@ -1,4 +1,4 @@
-package com.example.frost.vkvideomanager.dialog_fragment;
+package com.example.frost.vkvideomanager.album;
 
 
 import android.app.AlertDialog;
@@ -19,10 +19,10 @@ import com.example.frost.vkvideomanager.R;
 
 public class EditAlbumDialogFragment extends DialogFragment {
 
-    EditDialogListener listener;
-    String title;
-    String privacy;
-    int position;
+    private EditDialogListener listener;
+    private String title;
+    private String privacy;
+    private int position;
 
     public static EditAlbumDialogFragment newInstance(String title, String privacy, int position) {
         EditAlbumDialogFragment editAlbumDialogFragment = new EditAlbumDialogFragment();
@@ -50,10 +50,11 @@ public class EditAlbumDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View layout = inflater.inflate(R.layout.dialog_edit, null);
+
         final EditText albumName = (EditText) layout.findViewById(R.id.albumName);
         albumName.setText(title);
-        final Spinner spinner = (Spinner) layout.findViewById(R.id.spinner);
 
+        final Spinner spinner = (Spinner) layout.findViewById(R.id.spinnerDuration);
         switch (privacy) {
             case "all": spinner.setSelection(getIndex(spinner, "Все пользователи")); break;
             case "friends": spinner.setSelection(getIndex(spinner, "Только друзья")); break;
@@ -62,6 +63,7 @@ public class EditAlbumDialogFragment extends DialogFragment {
             case "nobody":
             case "only_me": spinner.setSelection(getIndex(spinner, "Tолько я")); break;
         }
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Редактирование альбома")
                 .setView(layout)

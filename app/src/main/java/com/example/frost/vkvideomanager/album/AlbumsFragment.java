@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.example.frost.vkvideomanager.BaseFragment;
 import com.example.frost.vkvideomanager.R;
-import com.example.frost.vkvideomanager.dialog_fragment.EditAlbumDialogFragment;
 import com.example.frost.vkvideomanager.network.Parser;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
@@ -103,6 +102,7 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
             albumIntent.putExtra("ownerId", albumList.get(position).getOwnerId());
             albumIntent.putExtra("albumId", albumList.get(position).getId());
             albumIntent.putExtra("albumTitle", albumList.get(position).getTitle());
+            albumIntent.putExtra("isMy", true);
             startActivity(albumIntent);
         } else if (v instanceof ImageButton) {
             showPopupMenu(v, position);

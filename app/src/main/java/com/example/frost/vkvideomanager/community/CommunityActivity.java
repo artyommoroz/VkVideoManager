@@ -52,7 +52,7 @@ public class CommunityActivity extends AppCompatActivity {
         String name = getIntent().getStringExtra(COMMUNITY_NAME);
         getSupportActionBar().setTitle(name);
 
-        int communityId = getIntent().getIntExtra(COMMUNITY_ID, 13) * -1;
+        int communityId = getIntent().getIntExtra(COMMUNITY_ID, 1);
         Log.d("CommunityID", String.valueOf(communityId));
         fragments.add(VideosFragment.newInstance(communityId, 0, false));
         fragments.add(WallFragment.newInstance(communityId));

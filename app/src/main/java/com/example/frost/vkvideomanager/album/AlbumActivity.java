@@ -37,7 +37,14 @@ public class AlbumActivity extends AppCompatActivity {
 
         int albumId = getIntent().getIntExtra("albumId", 13);
         int ownerId = getIntent().getIntExtra("ownerId", 13);
-        VideosFragment videoFragment = VideosFragment.newInstance(ownerId, albumId, false);
+        boolean isMy = getIntent().getBooleanExtra("isMy", false);
+
+        VideosFragment videoFragment;
+        if (isMy) {
+            videoFragment = VideosFragment.newInstance(ownerId, albumId, true);
+        } else {
+            videoFragment = VideosFragment.newInstance(ownerId, albumId, false);
+        }
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.container, videoFragment).commit();
     }

@@ -23,11 +23,6 @@ public class Album implements Parcelable {
         photo = from.optString("photo_160");
     }
 
-    public Album(JSONObject from, String v) {
-        id = from.optInt("id");
-        title = from.optString("title");
-    }
-
     private Album(Parcel source) {
         setId(source.readInt());
         setCount(source.readInt());

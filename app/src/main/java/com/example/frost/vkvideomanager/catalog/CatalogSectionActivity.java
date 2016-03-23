@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.example.frost.vkvideomanager.R;
@@ -41,9 +40,7 @@ public class CatalogSectionActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(sectionTitle);
 
         String sectionId = getIntent().getStringExtra(SECTION_ID);
-        Log.d("SectionActivityID", sectionId);
         String from = getIntent().getStringExtra(SECTION_FROM);
-        Log.d("SectionActivityFROM", from);
         CatalogSectionFragment catalogSectionFragment = CatalogSectionFragment.newInstance(sectionId, from);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.container, catalogSectionFragment).commit();

@@ -89,8 +89,10 @@ public class CommunitiesFragment extends Fragment implements CommunityAdapter.It
     @Override
     public void itemClicked(View v, int position) {
         Intent communityIntent = new Intent(getActivity(), CommunityActivity.class);
-        communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, communityList.get(position).id);
+        communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, communityList.get(position).id * -1);
         communityIntent.putExtra(CommunityActivity.COMMUNITY_NAME, communityList.get(position).name);
         startActivity(communityIntent);
     }
+
+
 }

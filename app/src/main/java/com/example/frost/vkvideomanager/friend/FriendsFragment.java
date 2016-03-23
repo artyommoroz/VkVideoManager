@@ -35,6 +35,8 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
 
     private FriendAdapter friendAdapter;
     private VKList<VKApiUser> friendList = new VKList<>();
+    private static final String TAG = "FriendsFragment";
+    
 
     public FriendsFragment() {}
 
@@ -58,6 +60,7 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
                 updateFriendList();
             }
         });
+
     }
 
     @Override

@@ -17,7 +17,6 @@ import android.widget.RelativeLayout;
 
 import com.example.frost.vkvideomanager.BaseFragment;
 import com.example.frost.vkvideomanager.EndlessScrollListener;
-import com.example.frost.vkvideomanager.MainActivity;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
 import com.example.frost.vkvideomanager.network.Parser;
@@ -47,8 +46,8 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
 
     public FavoritesFragment() {}
 
-    public static VideosFragment newInstance() {
-        return new VideosFragment();
+    public static FavoritesFragment newInstance() {
+        return new FavoritesFragment();
     }
 
     @Override
@@ -118,11 +117,7 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
             startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
         } else if (v instanceof ImageButton){
             PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-            if (getActivity() instanceof MainActivity) {
-                popupMenu.inflate(R.menu.popup_menu_my_video);
-            } else {
-                popupMenu.inflate(R.menu.popup_menu_video);
-            }
+            popupMenu.inflate(R.menu.popup_menu_video);
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -133,7 +128,6 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
                         case R.id.add_to_album:
                             AdditionRequests.addVideoToAlbum(getFragmentManager(), videoList.get(position));
                             return true;
-
                         default:
                             return false;
                     }

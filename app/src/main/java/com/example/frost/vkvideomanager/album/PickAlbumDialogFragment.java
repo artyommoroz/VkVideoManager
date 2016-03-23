@@ -1,4 +1,4 @@
-package com.example.frost.vkvideomanager.dialog_fragment;
+package com.example.frost.vkvideomanager.album;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -16,7 +16,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.frost.vkvideomanager.R;
-import com.example.frost.vkvideomanager.album.Album;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKBatchRequest;

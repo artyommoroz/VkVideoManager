@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.example.frost.vkvideomanager.BaseFragment;
 import com.example.frost.vkvideomanager.EndlessScrollListener;
-import com.example.frost.vkvideomanager.MainActivity;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
 import com.example.frost.vkvideomanager.network.Parser;
@@ -49,17 +48,17 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
     private VKList<VKApiVideo> videoList = new VKList<>();
     private int albumId;
     private int ownerId;
-    private boolean isFav;
+    private boolean isMy;
     private int offset;
 
     public VideosFragment() {}
 
-    public static VideosFragment newInstance(int ownerId, int albumId, boolean isFav) {
+    public static VideosFragment newInstance(int ownerId, int albumId, boolean isMy) {
         VideosFragment fragment = new VideosFragment();
         Bundle args = new Bundle();
         args.putInt("albumId", albumId);
         args.putInt("ownerId", ownerId);
-        args.putBoolean("isFav", isFav);
+        args.putBoolean("isMy", isMy);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,17 +77,10 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
                 offset += offset;
-                VKRequest videoRequest;
-                if (isFav) {
-                    videoRequest = new VKRequest("fave.getVideos", VKParameters.from(
-                            VKApiConst.OFFSET, offset,
-                            VKApiConst.EXTENDED, 1));
-                } else {
-                    videoRequest = VKApi.video().get(VKParameters.from(
+                VKRequest videoRequest = VKApi.video().get(VKParameters.from(
                             VKApiConst.OWNER_ID, ownerId,
                             VKApiConst.ALBUM_ID, albumId,
                             VKApiConst.OFFSET, offset));
-                }
                 videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
                     @Override
                     public void onComplete(VKResponse response) {
@@ -114,20 +106,15 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
         if (getArguments() != null) {
             albumId = getArguments().getInt("albumId");
             ownerId = getArguments().getInt("ownerId");
-            isFav = getArguments().getBoolean("isFav");
+            isMy = getArguments().getBoolean("isMy");
         }
         updateVideoList();
     }
 
     private void updateVideoList() {
-        VKRequest videoRequest;
-        if (isFav) {
-            videoRequest = new VKRequest("fave.getVideos", VKParameters.from(VKApiConst.EXTENDED, 1));
-        } else {
-            videoRequest = VKApi.video().get(VKParameters.from(
-                    VKApiConst.OWNER_ID, ownerId,
-                    VKApiConst.ALBUM_ID, albumId));
-        }
+        VKRequest videoRequest = VKApi.video().get(VKParameters.from(
+                VKApiConst.OWNER_ID, ownerId,
+                VKApiConst.ALBUM_ID, albumId));
         videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
@@ -150,11 +137,13 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
             startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
         } else if (v instanceof ImageButton){
             PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-            if (getActivity() instanceof MainActivity) {
+            if (isMy) {
                 popupMenu.inflate(R.menu.popup_menu_my_video);
             } else {
                 popupMenu.inflate(R.menu.popup_menu_video);
             }
+//            popupMenu.inflate(R.menu.popup_menu_my_video);
+
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {

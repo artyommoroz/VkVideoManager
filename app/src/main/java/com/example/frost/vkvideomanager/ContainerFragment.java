@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.frost.vkvideomanager.album.AlbumsFragment;
+import com.example.frost.vkvideomanager.video.FavoritesFragment;
 import com.example.frost.vkvideomanager.video.VideosFragment;
 import com.example.frost.vkvideomanager.wall.WallFragment;
 
@@ -50,10 +51,10 @@ public class ContainerFragment extends Fragment {
             ownerId = getArguments().getInt("ownerId");
         }
 
-        fragments.add(VideosFragment.newInstance(ownerId, 0, false));
+        fragments.add(VideosFragment.newInstance(ownerId, 0, true));
         fragments.add(AlbumsFragment.newInstance());
         fragments.add(WallFragment.newInstance(ownerId));
-        fragments.add(VideosFragment.newInstance(ownerId, 0, true));
+        fragments.add(FavoritesFragment.newInstance());
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getChildFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);

@@ -16,6 +16,7 @@ import com.example.frost.vkvideomanager.catalog.CatalogFragment;
 import com.example.frost.vkvideomanager.community.CommunitiesFragment;
 import com.example.frost.vkvideomanager.feed.FeedFragment;
 import com.example.frost.vkvideomanager.friend.FriendsFragment;
+import com.example.frost.vkvideomanager.search.SearchFragment;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.model.VKApiUser;
 
@@ -147,10 +148,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentManager.beginTransaction().replace(R.id.content, communitiesFragment).commit();
             tabLayout.setVisibility(View.GONE);
             getSupportActionBar().setTitle("Мои сообщества");
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_search) {
+            SearchFragment searchFragment = SearchFragment.newInstance();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content, searchFragment).commit();
+            tabLayout.setVisibility(View.GONE);
+            getSupportActionBar().setTitle("Новости");
         } else if (id == R.id.nav_send) {
-
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

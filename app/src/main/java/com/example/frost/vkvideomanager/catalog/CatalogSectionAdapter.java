@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -56,7 +57,8 @@ public class CatalogSectionAdapter extends StatelessSection {
 
     @Override
     public int getContentItemsTotal() {
-        return expanded ? catalogSection.getVideoList().size() : 3;
+//        return expanded ? catalogSection.getVideoList().size() : 3;
+        return expanded ? 10 : 3;
     }
 
     @Override
@@ -80,6 +82,7 @@ public class CatalogSectionAdapter extends StatelessSection {
                     albumIntent.putExtra("ownerId", albumList.get(position).getOwnerId());
                     albumIntent.putExtra("albumId", albumList.get(position).getId());
                     albumIntent.putExtra("albumTitle", albumList.get(position).getTitle());
+                    albumIntent.putExtra("isMy", false);
                     context.startActivity(albumIntent);
                 }
             });
@@ -149,9 +152,10 @@ public class CatalogSectionAdapter extends StatelessSection {
             @Override
             public void onClick(View v) {
                 if (catalogSection.getType().equals("channel")) {
-                    Intent communityIntent = new Intent(context, CommunityActivity.class);
-                    communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, catalogSection.getId());
-                    communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, catalogSection.getName());
+                    Intent communityIntent = new Intent (context, CommunityActivity.class);
+                    communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, Integer.valueOf(catalogSection.getId()));
+                    communityIntent.putExtra(CommunityActivity.COMMUNITY_NAME, catalogSection.getName());
+                    Log.d("CatalogId", catalogSection.getId());
                     context.startActivity(communityIntent);
                 }
             }
@@ -169,20 +173,18 @@ public class CatalogSectionAdapter extends StatelessSection {
         footerHolder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                footerHolder.expandView.setVisibility(View.GONE);
-                if (expanded) {
+                footerHolder.expandButton.setVisibility(View.GONE);
+                if (expanded == true) {
                     Intent sectionIntent = new Intent(context, CatalogSectionActivity.class);
                     sectionIntent.putExtra(CatalogSectionActivity.SECTION_ID, catalogSection.getId());
                     sectionIntent.putExtra(CatalogSectionActivity.SECTION_FROM, catalogSection.getNext());
                     sectionIntent.putExtra(CatalogSectionActivity.SECTION_TITLE, catalogSection.getName());
                     context.startActivity(sectionIntent);
-
-
                 }
-                expanded = true;
                 sectionAdapter.notifyDataSetChanged();
                 if (!catalogSection.getId().equals("series") && !catalogSection.getId().equals("top")) {
                     footerHolder.footerText.setVisibility(View.VISIBLE);
+                    expanded = true;
                 }
             }
         });
@@ -207,7 +209,6 @@ public class CatalogSectionAdapter extends StatelessSection {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
-
     }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
@@ -228,7 +229,7 @@ public class CatalogSectionAdapter extends StatelessSection {
         @Bind(R.id.footerText)
         TextView footerText;
         @Bind(R.id.expandButton)
-        ImageView expandView;
+        ImageView expandButton;
         @Bind(R.id.rootView)
         LinearLayout rootView;
 
