@@ -2,9 +2,11 @@ package com.example.frost.vkvideomanager.community;
 
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.example.frost.vkvideomanager.R;
+import com.example.frost.vkvideomanager.video.VideoAdapter;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
@@ -33,7 +36,7 @@ public class CommunitiesFragment extends Fragment implements CommunityAdapter.It
     @Bind(R.id.swipeRefresh)
     SwipeRefreshLayout swipeRefresh;
 
-    private CommunityAdapter friendAdapter;
+    private CommunityAdapter communityAdapter;
     private VKList<VKApiCommunity> communityList = new VKList<>();
 
     public CommunitiesFragment() {}
@@ -44,13 +47,26 @@ public class CommunitiesFragment extends Fragment implements CommunityAdapter.It
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        if (savedInstanceState != null) {
+            progressBar.setVisibility(View.GONE);
+            communityAdapter = new CommunityAdapter(getActivity(), communityList, CommunitiesFragment.this);
+            recyclerView.setAdapter(communityAdapter);
+        }
+
+        int orientation = getActivity().getResources().getConfiguration().orientation;
+        RecyclerView.LayoutManager layoutManager = null;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager = new LinearLayoutManager(getActivity());
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            layoutManager = new GridLayoutManager(getActivity(), 2);
+        }
         recyclerView.setLayoutManager(layoutManager);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -80,8 +96,8 @@ public class CommunitiesFragment extends Fragment implements CommunityAdapter.It
                     VKApiCommunity community = ((VKList<VKApiCommunity>) response.parsedModel).get(i);
                     communityList.add(community);
                 }
-                friendAdapter = new CommunityAdapter(getActivity(), communityList, CommunitiesFragment.this);
-                recyclerView.setAdapter(friendAdapter);
+                communityAdapter = new CommunityAdapter(getActivity(), communityList, CommunitiesFragment.this);
+                recyclerView.setAdapter(communityAdapter);
             }
         });
     }

@@ -1,12 +1,16 @@
 package com.example.frost.vkvideomanager.video;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,8 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.example.frost.vkvideomanager.BaseFragment;
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
 import com.example.frost.vkvideomanager.network.Parser;
@@ -31,7 +34,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class FavoritesFragment extends BaseFragment implements VideoAdapter.ItemClickListener {
+public class FavoritesFragment extends Fragment implements VideoAdapter.ItemClickListener {
 
     @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -43,11 +46,20 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
     private VideoAdapter videoAdapter;
     private VKList<VKApiVideo> videoList = new VKList<>();
     private int offset;
+    private static final String TAG = "FavoritesFragment";
+    private boolean isCreated;
 
     public FavoritesFragment() {}
 
     public static FavoritesFragment newInstance() {
         return new FavoritesFragment();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        updateVideoList();
+        isCreated = true;
     }
 
     @Override
@@ -58,39 +70,54 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
+        videoAdapter = new VideoAdapter(getActivity(), videoList, FavoritesFragment.this);
+        recyclerView.setAdapter(videoAdapter);
+
+        if (isCreated) {
+            progressBar.setVisibility(View.VISIBLE);
+            isCreated = false;
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+
+        int orientation = getActivity().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.addOnScrollListener(new EndlessScrollListener(linearLayoutManager) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    loadMore();
+                }
+            });
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            recyclerView.addOnScrollListener(new EndlessScrollListener(gridLayoutManager) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    loadMore();
+                }
+            });
+        }
+    }
+
+    private void loadMore() {
+        offset += offset;
+        VKRequest videoRequest = new VKRequest("fave.getVideos", VKParameters.from(
+                VKApiConst.OFFSET, offset,
+                VKApiConst.EXTENDED, 1));
+        videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                offset += offset;
-                VKRequest videoRequest = new VKRequest("fave.getVideos", VKParameters.from(
-                        VKApiConst.OFFSET, offset,
-                        VKApiConst.EXTENDED, 1));
-                videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        videoList.addAll(Parser.parseVideos(response));
-                        int curSize = videoAdapter.getItemCount();
-                        videoAdapter.notifyItemRangeInserted(curSize, videoList.size() - 1);
-                    }
-                });
-            }
-        });
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                updateVideoList();
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                videoList.addAll(Parser.parseVideos(response));
+                int curSize = videoAdapter.getItemCount();
+                videoAdapter.notifyItemRangeInserted(curSize, videoList.size() - 1);
             }
         });
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        updateVideoList();
-    }
 
     private void updateVideoList() {
         VKRequest videoRequest;
@@ -99,13 +126,14 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                progressBar.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.GONE);
                 swipeRefresh.setRefreshing(false);
                 videoList.clear();
                 videoList = Parser.parseVideos(response);
                 offset = videoList.size();
                 videoAdapter = new VideoAdapter(getActivity(), videoList, FavoritesFragment.this);
                 recyclerView.setAdapter(videoAdapter);
+                Log.d(TAG, "update: size of videoList" + String.valueOf(videoList.size()));
             }
         });
     }

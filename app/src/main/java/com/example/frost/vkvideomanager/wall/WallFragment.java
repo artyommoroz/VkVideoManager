@@ -3,6 +3,7 @@ package com.example.frost.vkvideomanager.wall;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,8 +17,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
-import com.example.frost.vkvideomanager.BaseFragment;
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.player.UrlHelper;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
+import com.example.frost.vkvideomanager.MainActivity;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
 import com.example.frost.vkvideomanager.network.Parser;
@@ -36,7 +38,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class WallFragment extends BaseFragment implements WallAdapter.ItemClickListener {
+public class WallFragment extends Fragment implements WallAdapter.ItemClickListener {
 
     @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -49,6 +51,7 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
     private int offset = 100;
     private WallAdapter wallAdapter;
     private int ownerId;
+    private boolean isCreated;
 
     public WallFragment() {}
 
@@ -61,6 +64,20 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            ownerId = getArguments().getInt("ownerId");
+        }
+        if(!(getActivity() instanceof MainActivity)) {
+            setRetainInstance(true);
+        }
+
+        updateWallVideoList();
+        isCreated = true;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_list, container, false);
@@ -69,6 +86,16 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        wallAdapter = new WallAdapter(getActivity(), wallVideoList, WallFragment.this);
+        recyclerView.setAdapter(wallAdapter);
+
+        if (isCreated) {
+            progressBar.setVisibility(View.VISIBLE);
+            isCreated = false;
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
@@ -100,14 +127,6 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
         });
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            ownerId = getArguments().getInt("ownerId");
-        }
-        updateWallVideoList();
-    }
 
     private void updateWallVideoList() {
         VKRequest wallRequest = VKApi.wall().get(VKParameters.from(
@@ -141,8 +160,8 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
                 public void onComplete(VKResponse response) {
                     super.onComplete(response);
                     VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
-                    Uri videoUri = Uri.parse(vkApiVideo.player);
-                    startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
+                    String videoUri = vkApiVideo.player;
+                    UrlHelper.playVideo(getActivity(), videoUri);
                 }
             });
         } else if (v instanceof ImageButton) {

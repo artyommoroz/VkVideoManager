@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_videos"
+            android:icon="@drawable/ic_videocam_white"
+            android:title="Мои видео"
+            android:checked="true" />
+        <item
+            android:id="@+id/nav_news"
+            android:icon="@drawable/ic_rss_feed_white"
+            android:title="Новости" />
+        <item
+            android:id="@+id/nav_catalog"
+            android:icon="@drawable/ic_catalog_white"
+            android:title="Каталог" />
+        <item
+            android:id="@+id/nav_friends"
+            android:icon="@drawable/ic_person_white_24dp"
+            android:title="Мои друзья" />
+        <item
+            android:id="@+id/nav_communities"
+            android:icon="@drawable/ic_people_white"
+            android:title="Мои сообщества" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/ic_search_white_24dp"
+            android:title="Поиск видеозаписей" />
+    </group>
+
+    <!--<item android:title="Communicate">-->
+    <group>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_settings_white_24dp"
+                android:title="Настройки" />
+    </group>
+
+</menu>

@@ -2,10 +2,13 @@ package com.example.frost.vkvideomanager.video;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -18,8 +21,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.frost.vkvideomanager.BaseFragment;
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.player.UrlHelper;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
+import com.example.frost.vkvideomanager.MainActivity;
+import com.example.frost.vkvideomanager.player.PlayerActivity;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
 import com.example.frost.vkvideomanager.network.Parser;
@@ -31,11 +36,12 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class VideosFragment extends BaseFragment implements VideoAdapter.ItemClickListener {
+public class VideosFragment extends Fragment implements VideoAdapter.ItemClickListener {
 
     @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -43,9 +49,11 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
     ProgressBar progressBar;
     @Bind(R.id.swipeRefresh)
     SwipeRefreshLayout swipeRefresh;
+    private static final String TAG = "VideosFragment";
 
     private VideoAdapter videoAdapter;
     private VKList<VKApiVideo> videoList = new VKList<>();
+    private boolean isCreated;
     private int albumId;
     private int ownerId;
     private boolean isMy;
@@ -64,40 +72,8 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_list, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                offset += offset;
-                VKRequest videoRequest = VKApi.video().get(VKParameters.from(
-                            VKApiConst.OWNER_ID, ownerId,
-                            VKApiConst.ALBUM_ID, albumId,
-                            VKApiConst.OFFSET, offset));
-                videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        videoList.addAll(Parser.parseVideos(response));
-                        int curSize = videoAdapter.getItemCount();
-                        videoAdapter.notifyItemRangeInserted(curSize, videoList.size() - 1);
-                    }
-                });
-            }
-        });
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                updateVideoList();
-            }
-        });
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -108,42 +84,88 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
             ownerId = getArguments().getInt("ownerId");
             isMy = getArguments().getBoolean("isMy");
         }
+
+        if(!(getActivity() instanceof MainActivity)) {
+            setRetainInstance(true);
+        }
+
         updateVideoList();
+        isCreated = true;
     }
 
-    private void updateVideoList() {
-        VKRequest videoRequest = VKApi.video().get(VKParameters.from(
-                VKApiConst.OWNER_ID, ownerId,
-                VKApiConst.ALBUM_ID, albumId));
-        videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        orientation = getActivity().getResources().getConfiguration().orientation;
+//        Log.d(TAG, "onAttach: orientation " + String.valueOf(orientation));
+//    }
+
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_list, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        ButterKnife.bind(this, view);
+        videoAdapter = new VideoAdapter(getActivity(), videoList, VideosFragment.this);
+        recyclerView.setAdapter(videoAdapter);
+
+        if (isCreated) {
+            progressBar.setVisibility(View.VISIBLE);
+            isCreated = false;
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
+
+        int orientation = getActivity().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.addOnScrollListener(new EndlessScrollListener(linearLayoutManager) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    loadMore();
+                }
+            });
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            recyclerView.addOnScrollListener(new EndlessScrollListener(gridLayoutManager) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+                    loadMore();
+                }
+            });
+        }
+
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onComplete(VKResponse response) {
-                super.onComplete(response);
-                progressBar.setVisibility(View.INVISIBLE);
-                swipeRefresh.setRefreshing(false);
-                videoList.clear();
-                videoList = Parser.parseVideos(response);
-                offset = videoList.size();
-                videoAdapter = new VideoAdapter(getActivity(), videoList, VideosFragment.this);
-                recyclerView.setAdapter(videoAdapter);
+            public void onRefresh() {
+                updateVideoList();
             }
         });
+    }
+
+    protected boolean isAppInstalled(String packageName) {
+        Intent mIntent = getActivity().getPackageManager().getLaunchIntentForPackage(packageName);
+        return mIntent != null;
     }
 
     @Override
     public void itemClicked(View v, final int position) {
         if (v instanceof RelativeLayout) {
-            Uri videoUri = Uri.parse(videoList.get(position).player);
-            startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
-        } else if (v instanceof ImageButton){
+            String videoUri = videoList.get(position).player;
+            UrlHelper.playVideo(getActivity(), videoUri);
+        } else if (v instanceof ImageButton) {
             PopupMenu popupMenu = new PopupMenu(getActivity(), v);
             if (isMy) {
                 popupMenu.inflate(R.menu.popup_menu_my_video);
             } else {
                 popupMenu.inflate(R.menu.popup_menu_video);
             }
-//            popupMenu.inflate(R.menu.popup_menu_my_video);
-
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -195,6 +217,42 @@ public class VideosFragment extends BaseFragment implements VideoAdapter.ItemCli
             });
             popupMenu.show();
         }
+    }
+
+    private void loadMore() {
+        offset += offset;
+        VKRequest videoRequest = VKApi.video().get(VKParameters.from(
+                VKApiConst.OWNER_ID, ownerId,
+                VKApiConst.ALBUM_ID, albumId,
+                VKApiConst.OFFSET, offset));
+        videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                videoList.addAll(Parser.parseVideos(response));
+                int curSize = videoAdapter.getItemCount();
+                videoAdapter.notifyItemRangeInserted(curSize, videoList.size() - 1);
+            }
+        });
+    }
+
+    private void updateVideoList() {
+        VKRequest videoRequest = VKApi.video().get(VKParameters.from(
+                VKApiConst.OWNER_ID, ownerId,
+                VKApiConst.ALBUM_ID, albumId));
+        videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                progressBar.setVisibility(View.GONE);
+                swipeRefresh.setRefreshing(false);
+                videoList.clear();
+                videoList = Parser.parseVideos(response);
+                offset = videoList.size();
+                videoAdapter = new VideoAdapter(getActivity(), videoList, VideosFragment.this);
+                recyclerView.setAdapter(videoAdapter);
+            }
+        });
     }
 
     public String getName() {

@@ -2,6 +2,7 @@ package com.example.frost.vkvideomanager.community;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,7 +33,7 @@ public class CommunityActivity extends AppCompatActivity {
     public static final String COMMUNITY_NAME = "community name";
     public static final String COMMUNITY_ID = "community id";
 
-    private List<BaseFragment> fragments = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

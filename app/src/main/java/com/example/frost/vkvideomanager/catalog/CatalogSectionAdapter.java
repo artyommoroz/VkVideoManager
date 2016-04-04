@@ -20,6 +20,7 @@ import com.example.frost.vkvideomanager.album.Album;
 import com.example.frost.vkvideomanager.album.AlbumActivity;
 import com.example.frost.vkvideomanager.community.CommunityActivity;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
+import com.example.frost.vkvideomanager.player.UrlHelper;
 import com.example.frost.vkvideomanager.utils.CircleTransform;
 import com.example.frost.vkvideomanager.utils.TimeConverter;
 import com.squareup.picasso.Picasso;
@@ -46,13 +47,11 @@ public class CatalogSectionAdapter extends StatelessSection {
     private VKList<VKApiVideo> videoList;
     private List<Album> albumList;
     private boolean expanded;
-    private SectionedRecyclerViewAdapter sectionAdapter;
 
-    public CatalogSectionAdapter(Context context, CatalogSection catalogSection, SectionedRecyclerViewAdapter sectionAdapter) {
+    public CatalogSectionAdapter(Context context, CatalogSection catalogSection) {
         super(R.layout.catalog_section_header, R.layout.catalog_section_footer, R.layout.item_video);
         this.catalogSection = catalogSection;
         this.context = context;
-        this.sectionAdapter = sectionAdapter;
     }
 
     @Override
@@ -102,8 +101,8 @@ public class CatalogSectionAdapter extends StatelessSection {
                         public void onComplete(VKResponse response) {
                             super.onComplete(response);
                             VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
-                            Uri videoUri = Uri.parse(vkApiVideo.player);
-                            context.startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
+                            String videoUri = vkApiVideo.player;
+                            UrlHelper.playVideo(context, videoUri);
                         }
                     });
                 }
@@ -155,7 +154,6 @@ public class CatalogSectionAdapter extends StatelessSection {
                     Intent communityIntent = new Intent (context, CommunityActivity.class);
                     communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, Integer.valueOf(catalogSection.getId()));
                     communityIntent.putExtra(CommunityActivity.COMMUNITY_NAME, catalogSection.getName());
-                    Log.d("CatalogId", catalogSection.getId());
                     context.startActivity(communityIntent);
                 }
             }
@@ -174,18 +172,17 @@ public class CatalogSectionAdapter extends StatelessSection {
             @Override
             public void onClick(View v) {
                 footerHolder.expandButton.setVisibility(View.GONE);
-                if (expanded == true) {
+                if (expanded) {
                     Intent sectionIntent = new Intent(context, CatalogSectionActivity.class);
                     sectionIntent.putExtra(CatalogSectionActivity.SECTION_ID, catalogSection.getId());
                     sectionIntent.putExtra(CatalogSectionActivity.SECTION_FROM, catalogSection.getNext());
                     sectionIntent.putExtra(CatalogSectionActivity.SECTION_TITLE, catalogSection.getName());
                     context.startActivity(sectionIntent);
                 }
-                sectionAdapter.notifyDataSetChanged();
                 if (!catalogSection.getId().equals("series") && !catalogSection.getId().equals("top")) {
                     footerHolder.footerText.setVisibility(View.VISIBLE);
-                    expanded = true;
                 }
+                expanded = true;
             }
         });
     }

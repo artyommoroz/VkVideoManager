@@ -1,4 +1,4 @@
-package com.example.frost.vkvideomanager;
+package com.example.frost.vkvideomanager.utils;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;

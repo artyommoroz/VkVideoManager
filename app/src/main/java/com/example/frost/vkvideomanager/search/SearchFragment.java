@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +23,8 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.player.UrlHelper;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
 import com.example.frost.vkvideomanager.network.Parser;
@@ -56,6 +58,8 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
     private int adult = 0;
     private int sort = 2;
     private String duration = "";
+    SearchView searchView;
+    private static final String TAG = "SearchFragment";
 
     public SearchFragment() {}
 
@@ -65,12 +69,19 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        if (savedInstanceState != null) {
+            progressBar.setVisibility(View.GONE);
+            videoAdapter = new VideoAdapter(getActivity(), videoList, SearchFragment.this);
+            recyclerView.setAdapter(videoAdapter);
+        }
+
         progressBar.setVisibility(View.GONE);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
@@ -117,7 +128,7 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.onActionViewExpanded();
         searchView.setMaxWidth(800);
         searchView.setOnQueryTextListener(this);
@@ -141,8 +152,8 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
     @Override
     public void itemClicked(View v, final int position) {
         if (v instanceof RelativeLayout) {
-            Uri videoUri = Uri.parse(videoList.get(position).player);
-            startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
+            String videoUri = videoList.get(position).player;
+            UrlHelper.playVideo(getActivity(), videoUri);
         } else if (v instanceof ImageButton){
             PopupMenu popupMenu = new PopupMenu(getActivity(), v);
             popupMenu.inflate(R.menu.popup_menu_video);
@@ -172,8 +183,15 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        query = newText;
-        getSearchResults(query, hd, adult, sort, duration);
+        if (newText.equals("")) {
+            videoList.clear();
+            videoAdapter = new VideoAdapter(getActivity(), videoList, SearchFragment.this);
+            recyclerView.setAdapter(videoAdapter);
+        } else {
+            query = newText;
+            getSearchResults(query, hd, adult, sort, duration);
+        }
+        Log.d(TAG, "onQueryTextChange: videoListSize" + String.valueOf(videoList.size()));
         return false;
     }
 
@@ -188,7 +206,7 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
         }
     }
 
-    private void getSearchResults(String query, int hd, int adult, int sort, String duration) {
+    private void getSearchResults(final String query, int hd, int adult, int sort, String duration) {
         VKRequest searchRequest = VKApi.video().search(VKParameters.from(
                 VKApiConst.Q, query,
                 VKApiConst.HD, hd,
@@ -204,7 +222,9 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
                 progressBar.setVisibility(View.INVISIBLE);
                 swipeRefresh.setRefreshing(false);
                 videoList.clear();
-                videoList = Parser.parseVideos(response);
+                if (!query.equals("")) {
+                    videoList = Parser.parseVideos(response);
+                }
                 offset = videoList.size();
                 videoAdapter = new VideoAdapter(getActivity(), videoList, SearchFragment.this);
                 recyclerView.setAdapter(videoAdapter);

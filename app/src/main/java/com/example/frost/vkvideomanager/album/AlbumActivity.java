@@ -46,6 +46,8 @@ public class AlbumActivity extends AppCompatActivity {
             videoFragment = VideosFragment.newInstance(ownerId, albumId, false);
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.container, videoFragment).commit();
+        if (savedInstanceState == null) {
+            fragmentManager.beginTransaction().add(R.id.container, videoFragment).commit();
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.frost.vkvideomanager.friend;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,7 +28,9 @@ public class FriendActivity extends AppCompatActivity {
     ViewPager viewPager;
     @Bind(R.id.tabLayout)
     TabLayout tabLayout;
-    private List<BaseFragment> fragments = new ArrayList<>();
+
+//    private List<BaseFragment> fragments = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class FriendActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(friendFullName);
 
         int friendId = getIntent().getIntExtra("friendId", 13);
+
         fragments.add(VideosFragment.newInstance(friendId, 0, false));
         fragments.add(WallFragment.newInstance(friendId));
 

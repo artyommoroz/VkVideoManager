@@ -1,8 +1,10 @@
 package com.example.frost.vkvideomanager.friend;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.widget.ProgressBar;
 
 import com.example.frost.vkvideomanager.BaseFragment;
 import com.example.frost.vkvideomanager.R;
+import com.example.frost.vkvideomanager.community.CommunityAdapter;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKParameters;
@@ -35,8 +38,6 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
 
     private FriendAdapter friendAdapter;
     private VKList<VKApiUser> friendList = new VKList<>();
-    private static final String TAG = "FriendsFragment";
-    
 
     public FriendsFragment() {}
 
@@ -46,13 +47,26 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        if (savedInstanceState != null) {
+            progressBar.setVisibility(View.GONE);
+            friendAdapter = new FriendAdapter(getActivity(), friendList, FriendsFragment.this);
+            recyclerView.setAdapter(friendAdapter);
+        }
+
+        int orientation = getActivity().getResources().getConfiguration().orientation;
+        RecyclerView.LayoutManager layoutManager = null;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager = new LinearLayoutManager(getActivity());
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            layoutManager = new GridLayoutManager(getActivity(), 3);
+        }
         recyclerView.setLayoutManager(layoutManager);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -60,12 +74,12 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
                 updateFriendList();
             }
         });
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        setRetainInstance(true);
         updateFriendList();
     }
 

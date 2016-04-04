@@ -16,6 +16,7 @@ import com.example.frost.vkvideomanager.MainActivity;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.friend.FriendActivity;
 import com.example.frost.vkvideomanager.network.AdditionRequests;
+import com.example.frost.vkvideomanager.player.UrlHelper;
 import com.example.frost.vkvideomanager.utils.CircleTransform;
 import com.example.frost.vkvideomanager.utils.TimeConverter;
 import com.squareup.picasso.Picasso;
@@ -49,7 +50,6 @@ public class FeedSectionAdapter extends StatelessSection {
     @Override
     public int getContentItemsTotal() {
         return feedSection.getVideoList().size();
-//        return expanded ? 10 : 3;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class FeedSectionAdapter extends StatelessSection {
                     public void onComplete(VKResponse response) {
                         super.onComplete(response);
                         VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
-                        Uri videoUri = Uri.parse(vkApiVideo.player);
-                        context.startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
+                        String videoUri = vkApiVideo.player;
+                        UrlHelper.playVideo(context, videoUri);
                     }
                 });
             }

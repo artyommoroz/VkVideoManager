@@ -2,10 +2,13 @@ package com.example.frost.vkvideomanager.album;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.frost.vkvideomanager.BaseFragment;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.Parser;
 import com.vk.sdk.api.VKApi;
@@ -34,7 +36,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemClickListener,
+public class AlbumsFragment extends Fragment implements AlbumAdapter.ItemClickListener,
         EditAlbumDialogFragment.EditDialogListener {
 
     @Bind(R.id.recyclerView)
@@ -45,12 +47,20 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
     SwipeRefreshLayout swipeRefresh;
 
     private List<Album> albumList = new ArrayList<>();
-    AlbumAdapter albumAdapter;
+    private AlbumAdapter albumAdapter;
+    private boolean isCreated;
 
     public AlbumsFragment() {}
 
     public static AlbumsFragment newInstance() {
         return new AlbumsFragment();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        updateAlbumList();
+        isCreated = true;
     }
 
     @Override
@@ -62,8 +72,22 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        albumAdapter = new AlbumAdapter(getActivity(), albumList, AlbumsFragment.this);
+        recyclerView.setAdapter(albumAdapter);
+        if (isCreated) {
+            progressBar.setVisibility(View.VISIBLE);
+            isCreated = false;
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        int orientation = getActivity().getResources().getConfiguration().orientation;
+        RecyclerView.LayoutManager layoutManager = null;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager = new LinearLayoutManager(getActivity());
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            layoutManager = new GridLayoutManager(getActivity(), 2);
+        }
         recyclerView.setLayoutManager(layoutManager);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -71,12 +95,6 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
                 updateAlbumList();
             }
         });
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        updateAlbumList();
     }
 
     private void updateAlbumList() {

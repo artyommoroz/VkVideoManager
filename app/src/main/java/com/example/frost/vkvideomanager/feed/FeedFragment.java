@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.Parser;
 import com.vk.sdk.api.VKApiConst;
@@ -37,6 +37,7 @@ public class FeedFragment extends Fragment {
     @Bind(R.id.swipeRefresh)
     SwipeRefreshLayout swipeRefresh;
 
+    private static final String TAG = "FeedFragment";
     private List<FeedSection> feedSectionList = new ArrayList<>();
     private SectionedRecyclerViewAdapter sectionAdapter;
     private String startFrom;
@@ -51,12 +52,19 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        setRetainInstance(true);
+        if (savedInstanceState != null) {
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setAdapter(sectionAdapter);
+        }
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {

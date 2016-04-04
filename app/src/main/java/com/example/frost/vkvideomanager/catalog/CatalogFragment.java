@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.Parser;
 import com.vk.sdk.api.VKApiConst;
@@ -49,12 +49,18 @@ public class CatalogFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
+        if (savedInstanceState != null) {
+            progressBar.setVisibility(View.GONE);
+            recyclerView.setAdapter(sectionAdapter);
+        }
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
@@ -73,7 +79,7 @@ public class CatalogFragment extends Fragment {
                         List<CatalogSection> loadedCatalogSectionList = Parser.parseCatalog(response);
                         for (int i = 0; i < loadedCatalogSectionList.size(); i++) {
                             CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(),
-                                    loadedCatalogSectionList.get(i), sectionAdapter);
+                                    loadedCatalogSectionList.get(i));
                             sectionAdapter.addSection(catalogSectionAdapter);
                         }
                         try {
@@ -124,7 +130,7 @@ public class CatalogFragment extends Fragment {
                 catalogSectionList = Parser.parseCatalog(response);
                 sectionAdapter = new SectionedRecyclerViewAdapter();
                 for (int i = 0; i < catalogSectionList.size(); i++) {
-                    CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(), catalogSectionList.get(i), sectionAdapter);
+                    CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(), catalogSectionList.get(i));
                     sectionAdapter.addSection(catalogSectionAdapter);
                 }
                 recyclerView.setAdapter(sectionAdapter);

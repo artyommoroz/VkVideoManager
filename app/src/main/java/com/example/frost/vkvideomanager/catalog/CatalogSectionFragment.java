@@ -12,7 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.example.frost.vkvideomanager.EndlessScrollListener;
+import com.example.frost.vkvideomanager.player.UrlHelper;
+import com.example.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.example.frost.vkvideomanager.R;
 import com.example.frost.vkvideomanager.network.Parser;
 import com.example.frost.vkvideomanager.video.VideoAdapter;
@@ -127,8 +128,8 @@ public class CatalogSectionFragment extends Fragment implements VideoAdapter.Ite
     @Override
     public void itemClicked(View v, int position) {
         if (v instanceof LinearLayout) {
-            Uri videoUri = Uri.parse(videoList.get(position).player);
-            startActivity(new Intent(Intent.ACTION_VIEW, videoUri));
+            String videoUri = videoList.get(position).player;
+            UrlHelper.playVideo(getContext(), videoUri);
         }
     }
 }
