@@ -1,0 +1,240 @@
+package com.frost.vkvideomanager.catalog;
+
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.frost.vkvideomanager.R;
+import com.frost.vkvideomanager.MainActivity;
+import com.frost.vkvideomanager.album.Album;
+import com.frost.vkvideomanager.album.AlbumActivity;
+import com.frost.vkvideomanager.community.CommunityActivity;
+import com.frost.vkvideomanager.network.AdditionRequests;
+import com.frost.vkvideomanager.player.UrlHelper;
+import com.frost.vkvideomanager.utils.CircleTransform;
+import com.frost.vkvideomanager.utils.TimeConverter;
+import com.squareup.picasso.Picasso;
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKApiConst;
+import com.vk.sdk.api.VKParameters;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
+import com.vk.sdk.api.model.VKApiVideo;
+import com.vk.sdk.api.model.VKList;
+
+import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
+
+
+public class CatalogSectionAdapter extends StatelessSection {
+
+    private CatalogSection catalogSection;
+    private Context context;
+    private VKList<VKApiVideo> videoList;
+    private List<Album> albumList;
+    private boolean expanded;
+
+    public CatalogSectionAdapter(Context context, CatalogSection catalogSection) {
+        super(R.layout.catalog_section_header, R.layout.catalog_section_footer, R.layout.item_video_catalog);
+        this.catalogSection = catalogSection;
+        this.context = context;
+    }
+
+    @Override
+    public int getContentItemsTotal() {
+        return expanded ? 10 : 3;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder getItemViewHolder(View view) {
+        return new ItemViewHolder(view);
+    }
+
+    @Override
+    public void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        ItemViewHolder itemHolder = (ItemViewHolder) holder;
+        if (catalogSection.getId().equals("series")) {
+            albumList = catalogSection.getAlbumList();
+            itemHolder.title.setText(albumList.get(position).getTitle());
+            itemHolder.views.setText(context.getString(R.string.album_number_of_videos, albumList.get(position).getCount()));
+            itemHolder.moreButton.setVisibility(View.GONE);
+            Picasso.with(context).load(albumList.get(position).getPhoto()).fit().centerCrop().into(itemHolder.imageVideo);
+            itemHolder.rootView.setOnClickListener(v -> {
+                Intent albumIntent = new Intent(context, AlbumActivity.class);
+                albumIntent.putExtra(AlbumActivity.OWNER_ID, albumList.get(position).getOwnerId());
+                albumIntent.putExtra(AlbumActivity.ALBUM_ID, albumList.get(position).getId());
+                albumIntent.putExtra(AlbumActivity.ALBUM_TITLE, albumList.get(position).getTitle());
+                albumIntent.putExtra(AlbumActivity.IS_MY, false);
+                context.startActivity(albumIntent);
+            });
+        } else {
+            videoList = catalogSection.getVideoList();
+            itemHolder.title.setText(videoList.get(position).title);
+            itemHolder.duration.setText(TimeConverter.secondsToHHmmss(videoList.get(position).duration));
+            itemHolder.views.setText(TimeConverter.getViewsWithRightEnding(videoList.get(position).views));
+            Picasso.with(context).load(videoList.get(position).photo_320).fit().centerCrop().into(itemHolder.imageVideo);
+            itemHolder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    VKRequest videoRequest = VKApi.video().get(VKParameters.from(
+                            VKApiConst.VIDEOS, videoList.get(position).owner_id + "_" + videoList.get(position).id));
+                    videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
+                        @Override
+                        public void onComplete(VKResponse response) {
+                            super.onComplete(response);
+                            VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
+                            String videoUri = vkApiVideo.player;
+                            UrlHelper.playVideo(context, videoUri);
+                        }
+                    });
+                }
+            });
+        }
+        itemHolder.moreButton.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(context, v);
+            popupMenu.inflate(R.menu.popup_menu_video);
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.add:
+                            AdditionRequests.addVideo(context, videoList.get(position));
+                            return true;
+                        case R.id.add_to_album:
+                            AdditionRequests.addVideoToAlbum(((MainActivity) context).getSupportFragmentManager(),
+                                    videoList.get(position));
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            });
+            popupMenu.show();
+        });
+    }
+
+    @Override
+    public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
+        return new HeaderViewHolder(view);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
+        HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
+        switch (catalogSection.getId()) {
+            case "ugc":
+                headerHolder.icon.setImageResource(R.drawable.ic_whatshot_white_24dp);
+                break;
+            case "series":
+                headerHolder.icon.setImageResource(R.drawable.ic_live_tv_white_24dp);
+                break;
+            case "top":
+                headerHolder.icon.setImageResource(R.drawable.ic_star_white_24dp);
+                break;
+            default:
+                Picasso.with(context).load(catalogSection.getIcon()).fit().centerCrop()
+                        .transform(new CircleTransform()).into(headerHolder.icon);
+                break;
+        }
+
+        headerHolder.name.setText(catalogSection.getName());
+        headerHolder.icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (catalogSection.getType().equals("channel")) {
+                    Intent communityIntent = new Intent (context, CommunityActivity.class);
+                    communityIntent.putExtra(CommunityActivity.COMMUNITY_ID, Integer.valueOf(catalogSection.getId()));
+                    communityIntent.putExtra(CommunityActivity.COMMUNITY_NAME, catalogSection.getName());
+                    context.startActivity(communityIntent);
+                }
+            }
+        });
+    }
+
+    @Override
+    public RecyclerView.ViewHolder getFooterViewHolder(View view) {
+        return new FooterViewHolder(view);
+    }
+
+    @Override
+    public void onBindFooterViewHolder(RecyclerView.ViewHolder holder) {
+        final FooterViewHolder footerHolder = (FooterViewHolder) holder;
+        footerHolder.rootView.setOnClickListener(v -> {
+            footerHolder.expandButton.setVisibility(View.GONE);
+            if (expanded) {
+                Intent sectionIntent = new Intent(context, CatalogSectionActivity.class);
+                sectionIntent.putExtra(CatalogSectionActivity.SECTION_ID, catalogSection.getId());
+                sectionIntent.putExtra(CatalogSectionActivity.SECTION_FROM, catalogSection.getNext());
+                sectionIntent.putExtra(CatalogSectionActivity.SECTION_TITLE, catalogSection.getName());
+                context.startActivity(sectionIntent);
+            }
+            if (!catalogSection.getId().equals("series") && !catalogSection.getId().equals("top")) {
+                footerHolder.footerText.setVisibility(View.VISIBLE);
+            }
+            expanded = true;
+        });
+    }
+
+    class ItemViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.rootView)
+        RelativeLayout rootView;
+        @Bind(R.id.title)
+        TextView title;
+        @Bind(R.id.views)
+        TextView views;
+        @Bind(R.id.duration)
+        TextView duration;
+        @Bind(R.id.imageVideo)
+        ImageView imageVideo;
+        @Bind(R.id.moreButton)
+        ImageButton moreButton;
+
+        public ItemViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.icon)
+        ImageButton icon;
+        @Bind(R.id.name)
+        TextView name;
+
+        public HeaderViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
+
+    class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.footerText)
+        TextView footerText;
+        @Bind(R.id.expandButton)
+        ImageView expandButton;
+        @Bind(R.id.rootView)
+        LinearLayout rootView;
+
+        public FooterViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
+}

@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item android:id="@+id/action_search"
-        android:title="Search"
-        app:showAsAction="always"
+        android:title="@string/drawer_item_search"
+        app:showAsAction="ifRoom"
         android:orderInCategory="1"
         app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item android:id="@+id/action_parameters"
-        android:title="Filter"
+        android:title="@string/drawer_item_logout"
         android:icon="@drawable/ic_tune_white_24dp"
         android:enabled="true"
         android:orderInCategory="2"

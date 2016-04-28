@@ -1,0 +1,85 @@
+package com.frost.vkvideomanager.album;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.frost.vkvideomanager.R;
+import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
+public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
+
+    private List<Album> albumList;
+    private Context context;
+    private ItemClickListener itemClickListener;
+
+    public AlbumAdapter(Context context, List<Album> albumList, ItemClickListener itemClickListener) {
+        this.context = context;
+        this.albumList = albumList;
+        this.itemClickListener = itemClickListener;
+    }
+
+    @Override
+    public AlbumViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_album, parent, false);
+        return new AlbumViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(AlbumViewHolder holder, int position) {
+        holder.title.setText(albumList.get(position).getTitle());
+        holder.count.setText(context.getString(R.string.album_number_of_videos, albumList.get(position).getCount()));
+        if (albumList.get(position).getCount() > 0) {
+            Picasso.with(context).load(albumList.get(position).getPhoto()).fit().centerCrop().into(holder.image);
+            if (albumList.get(position).getPrivacy().equals("only_me")
+                    || albumList.get(position).getPrivacy().equals("nobody")) {
+                holder.privacy.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return albumList.size();
+    }
+
+    public class AlbumViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        @Bind(R.id.count)
+        TextView count;
+        @Bind(R.id.title)
+        TextView title;
+        @Bind(R.id.imageAlbum)
+        ImageView image;
+        @Bind(R.id.privacy)
+        ImageView privacy;
+        @Bind(R.id.moreButton)
+        ImageButton moreButton;
+
+        public AlbumViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+            moreButton.setOnClickListener(this);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            itemClickListener.itemClicked(v, getLayoutPosition());
+        }
+    }
+
+    public interface ItemClickListener {
+        void itemClicked(View v, int position);
+    }
+}

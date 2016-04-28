@@ -2,40 +2,43 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_videos"
             android:icon="@drawable/ic_videocam_white"
-            android:title="Мои видео"
+            android:title="@string/drawer_item_videos"
             android:checked="true" />
         <item
             android:id="@+id/nav_news"
             android:icon="@drawable/ic_rss_feed_white"
-            android:title="Новости" />
+            android:title="@string/drawer_item_newsfeed" />
         <item
             android:id="@+id/nav_catalog"
             android:icon="@drawable/ic_catalog_white"
-            android:title="Каталог" />
+            android:title="@string/drawer_item_catalog" />
         <item
             android:id="@+id/nav_friends"
             android:icon="@drawable/ic_person_white_24dp"
-            android:title="Мои друзья" />
+            android:title="@string/drawer_item_friends" />
         <item
             android:id="@+id/nav_communities"
             android:icon="@drawable/ic_people_white"
-            android:title="Мои сообщества" />
+            android:title="@string/drawer_item_communities" />
         <item
             android:id="@+id/nav_search"
             android:icon="@drawable/ic_search_white_24dp"
-            android:title="Поиск видеозаписей" />
+            android:title="@string/drawer_item_search" />
     </group>
 
-    <!--<item android:title="Communicate">-->
-    <group>
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_settings_white_24dp"
-                android:title="Настройки" />
+                android:icon="@drawable/ic_exit_to_app_white_24dp"
+                android:title="@string/drawer_item_logout" />
     </group>
 
 </menu>

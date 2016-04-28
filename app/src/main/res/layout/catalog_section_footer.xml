@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -10,19 +10,19 @@
     android:elevation="2dp"
     android:background="@android:color/white"
     android:layout_marginBottom="8dp"
-    >
+    tools:targetApi="lollipop">
 
     <TextView
         android:id="@+id/footerText"
-        android:text="SHOW ALL"
-        android:textColor="@color/vk_share_link_title_color"
-        android:textSize="16sp"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/catalog_footer_title"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:gravity="center"
         android:padding="16dp"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/expandButton"

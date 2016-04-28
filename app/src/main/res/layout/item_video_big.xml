@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:id="@+id/rootView"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="1dp"
     android:elevation="2dp"
     android:background="@android:color/white"
-    >
+    tools:targetApi="lollipop">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        >
+        android:paddingTop="8dp" >
 
         <ImageView
             android:id="@+id/imageVideo"
             android:layout_width="match_parent"
             android:layout_height="184dp"
-            android:scaleType="fitStart"
-            android:contentDescription="image"/>
+            android:scaleType="fitStart" />
 
         <TextView
             android:id="@+id/duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
-            android:text="15:15"
             android:textColor="#FFF"
             android:textSize="12sp"
             android:padding="4dp"
@@ -47,17 +45,18 @@
         android:paddingRight="8dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
-        android:background="@android:color/white"
-        >
+        android:background="?android:attr/selectableItemBackground" >
 
         <TextView
             android:id="@+id/title"
-            android:text="Oasis - Wonderwall"
-            android:textColor="@android:color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:paddingRight="30dp"
+            android:gravity="center_vertical"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
@@ -66,11 +65,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_more_vert_grey_500_24dp"
-            android:background="@android:color/transparent"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="8dp"/>
+            android:layout_alignParentEnd="true" />
+
     </RelativeLayout>
 
 </LinearLayout>

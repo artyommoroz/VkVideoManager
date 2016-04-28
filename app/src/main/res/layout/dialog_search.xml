@@ -1,22 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:paddingLeft="24dp"
+    android:paddingRight="16dp">
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Длительность"
+        android:paddingTop="16dp"
+        android:layout_marginRight="16dp"
+        android:text="@string/search_dialog_duration"
+        android:textSize="16sp"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/spinnerDuration"
-        android:layout_toStartOf="@+id/spinnerDuration" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Сортировка"
+        android:paddingTop="0dp"
+        android:text="@string/search_dialog_sort"
+        android:textSize="16sp"
         android:id="@+id/textView2"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -24,29 +32,31 @@
 
     <Spinner
         android:id="@+id/spinnerSort"
-        android:layout_width="200dp"
+        android:layout_width="164dp"
         android:layout_height="wrap_content"
         android:entries="@array/sort_list"
         android:spinnerMode="dropdown"
-        android:layout_below="@+id/spinnerDuration"
-        android:layout_alignLeft="@+id/spinnerDuration"
-        android:layout_alignStart="@+id/spinnerDuration" />
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Spinner
         android:id="@+id/spinnerDuration"
-        android:layout_width="200dp"
+        android:layout_width="164dp"
         android:layout_height="wrap_content"
         android:entries="@array/duration_list"
         android:spinnerMode="dropdown"
-        android:layout_alignTop="@+id/textView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:paddingRight="16dp"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <CheckBox
         android:id="@+id/hdCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Высокое качество"
+        android:text="@string/search_dialog_hd"
+        android:layout_marginTop="0dp"
         android:layout_below="@+id/spinnerSort"
         android:checked="false"
         android:layout_alignRight="@+id/spinnerSort"
@@ -58,12 +68,52 @@
         android:id="@+id/adultCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Безопасный поиск"
+        android:text="@string/search_dialog_adult"
+        android:layout_marginBottom="8dp"
         android:checked="false"
         android:layout_below="@+id/hdCheckBox"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/hdCheckBox"
         android:layout_alignEnd="@+id/hdCheckBox" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/adultCheckBox"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/relativeLayout2">
+
+        <Button
+            android:id="@+id/buttonNegative"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/cancel"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/buttonPositive"
+            android:layout_toLeftOf="@+id/buttonPositive" />
+
+        <Button
+            android:id="@+id/buttonPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/apply"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

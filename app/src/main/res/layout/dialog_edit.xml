@@ -1,32 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
-
-
-    <TextView
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Название альбома"
-        android:id="@+id/textView" />
-
-    <EditText
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/albumName" />
+    android:paddingRight="16dp"
+    android:paddingLeft="24dp"
+    android:paddingTop="12dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Кто может просматривать этот альбом?"
-        android:id="@+id/textView2" />
+        android:text="@string/album_dialog_edit_name"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/albumName"
+        android:layout_width="351dp"
+        android:layout_height="wrap_content"
+        android:inputType="text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/album_dialog_edit_privacy"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp" />
 
     <Spinner
         android:id="@+id/spinnerDuration"
-        android:layout_width="200dp"
+        android:layout_width="164dp"
         android:layout_height="wrap_content"
         android:entries="@array/privacy_list"
         android:spinnerMode="dropdown" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonNegative"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/buttonPositive"
+            android:layout_toLeftOf="@+id/buttonPositive" />
+
+        <Button
+            android:id="@+id/buttonPositive"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/apply"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
 
 </LinearLayout>
