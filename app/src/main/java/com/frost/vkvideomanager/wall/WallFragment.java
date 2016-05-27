@@ -2,28 +2,19 @@ package com.frost.vkvideomanager.wall;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.MainActivity;
 import com.frost.vkvideomanager.network.AdditionRequests;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
+import com.frost.vkvideomanager.BaseFragment;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -36,34 +27,17 @@ import com.vk.sdk.api.model.VKList;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
 public class WallFragment extends BaseFragment implements WallAdapter.ItemClickListener {
 
-    @Bind(R.id.rootView)
-    RelativeLayout rootView;
-    @Bind(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @Bind(R.id.progressBar)
-    ProgressBar progressBar;
-    @Bind(R.id.swipeRefresh)
-    SwipeRefreshLayout swipeRefresh;
-    @Bind(R.id.noConnectionView)
-    RelativeLayout noConnectionView;
-    @Bind(R.id.retryButton)
-    Button retryButton;
-    @Bind(R.id.noVideosView)
-    TextView noVideosView;
-
     private static final String OWNER_ID = "ownerId";
 
     private List<WallVideo> wallVideoList = new ArrayList<>();
-    private int offset = 100;
     private WallAdapter wallAdapter;
+    private int offset = 100;
     private int ownerId;
-    private boolean isCreated;
     private boolean noConnection;
     private boolean noVideos;
 
@@ -92,23 +66,10 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_list, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
+        super.onViewCreated(view, savedInstanceState);
         wallAdapter = new WallAdapter(getActivity(), wallVideoList, WallFragment.this);
         recyclerView.setAdapter(wallAdapter);
-
-        if (isCreated) {
-            progressBar.setVisibility(View.VISIBLE);
-            isCreated = false;
-        } else {
-            progressBar.setVisibility(View.GONE);
-        }
 
         if (noConnection  && wallVideoList.isEmpty()) {
             noConnectionView.setVisibility(View.VISIBLE);
@@ -231,8 +192,4 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
         }
     }
 
-    public String getName() {
-//        return getString(R.string.wall);
-        return "СТЕНА";
-    }
 }

@@ -2,13 +2,10 @@ package com.frost.vkvideomanager.search;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,9 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.frost.vkvideomanager.R;
@@ -26,6 +21,7 @@ import com.frost.vkvideomanager.network.AdditionRequests;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
+import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.video.VideoAdapter;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
@@ -36,22 +32,10 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class SearchFragment extends Fragment implements VideoAdapter.ItemClickListener,
+public class SearchFragment extends BaseFragment implements VideoAdapter.ItemClickListener,
         SearchView.OnQueryTextListener, SearchParametersDialogFragment.SearchParametersListener {
-
-    @Bind(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @Bind(R.id.progressBar)
-    ProgressBar progressBar;
-    @Bind(R.id.swipeRefresh)
-    SwipeRefreshLayout swipeRefresh;
-    @Bind(R.id.noConnectionView)
-    RelativeLayout noConnectionView;
-    @Bind(R.id.retryButton)
-    Button retryButton;
 
     private VideoAdapter videoAdapter;
     private VKList<VKApiVideo> videoList = new VKList<>();
@@ -85,7 +69,7 @@ public class SearchFragment extends Fragment implements VideoAdapter.ItemClickLi
             recyclerView.setAdapter(videoAdapter);
         }
 
-        if (noConnection  && videoList.isEmpty()) {
+        if (noConnection && videoList.isEmpty()) {
             noConnectionView.setVisibility(View.VISIBLE);
         } else if (!noConnection  && videoList.size() > 0) {
             noConnectionView.setVisibility(View.GONE);

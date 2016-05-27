@@ -230,37 +230,25 @@ public class Parser {
             JSONObject jSection = jSections.optJSONObject(i);
             CatalogSection catalogSection = new CatalogSection(jSection);
             VKList<VKApiVideo> videoList = new VKList<>();
-            List<Album> albumList = new ArrayList<>();
             JSONArray jItems = jSection.optJSONArray("items");
-            if (catalogSection.getId().equals("series")) {
-                for (int j = 0; j < jItems.length(); j++) {
-                    Album album = new Album(jItems.optJSONObject(j));
-                    albumList.add(album);
+            for (int j = 0; j < jItems.length(); j++) {
+                try {
+                    VKApiVideo vkApiVideo = new VKApiVideo(jItems.optJSONObject(j));
+                    videoList.add(vkApiVideo);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                catalogSection.setAlbumList(albumList);
             }
-            else {
-                for (int j = 0; j < jItems.length(); j++) {
-                    try {
-                        VKApiVideo vkApiVideo = new VKApiVideo(jItems.optJSONObject(j));
-                        videoList.add(vkApiVideo);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                catalogSection.setVideoList(videoList);
-            }
+            catalogSection.setVideoList(videoList);
             catalogSectionList.add(catalogSection);
         }
 
         for (int i = 0; i < catalogSectionList.size(); i++) {
             String sectionId = catalogSectionList.get(i).getId();
-            if (!sectionId.equals("series")) {
-                for (int j = 0; j < communityList.size(); j++) {
-                    if (sectionId.equals("ugc") || sectionId.equals("top")
-                            || Integer.valueOf(sectionId) == -1 * communityList.get(j).id) {
-                        catalogSectionList.get(i).setIcon(communityList.get(j).photo_100);
-                    }
+            for (int j = 0; j < communityList.size(); j++) {
+                if (sectionId.equals("ugc") || sectionId.equals("top")
+                        || Integer.valueOf(sectionId) == -1 * communityList.get(j).id) {
+                    catalogSectionList.get(i).setIcon(communityList.get(j).photo_100);
                 }
             }
         }

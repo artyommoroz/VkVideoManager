@@ -2,20 +2,15 @@ package com.frost.vkvideomanager.feed;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
+import com.frost.vkvideomanager.BaseFragment;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -27,24 +22,23 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
-public class FeedFragment extends Fragment {
+public class FeedFragment extends BaseFragment {
 
-    @Bind(R.id.rootView)
-    RelativeLayout rootView;
-    @Bind(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @Bind(R.id.progressBar)
-    ProgressBar progressBar;
-    @Bind(R.id.swipeRefresh)
-    SwipeRefreshLayout swipeRefresh;
-    @Bind(R.id.noConnectionView)
-    RelativeLayout noConnectionView;
-    @Bind(R.id.retryButton)
-    Button retryButton;
+//    @Bind(R.id.rootView)
+//    RelativeLayout rootView;
+//    @Bind(R.id.recyclerView)
+//    RecyclerView recyclerView;
+//    @Bind(R.id.progressBar)
+//    ProgressBar progressBar;
+//    @Bind(R.id.swipeRefresh)
+//    SwipeRefreshLayout swipeRefresh;
+//    @Bind(R.id.noConnectionView)
+//    RelativeLayout noConnectionView;
+//    @Bind(R.id.retryButton)
+//    Button retryButton;
 
     private static final String NEWSFEED_REQUEST = "newsfeed.get";
 

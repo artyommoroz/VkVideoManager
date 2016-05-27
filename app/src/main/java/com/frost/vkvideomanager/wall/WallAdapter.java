@@ -52,7 +52,6 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
                 .fit().centerCrop().into(holder.imageVideo);
     }
 
-
     @Override
     public int getItemCount() {
         return wallVideoList.size();

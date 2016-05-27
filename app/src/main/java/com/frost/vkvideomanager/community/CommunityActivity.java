@@ -2,13 +2,12 @@ package com.frost.vkvideomanager.community;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.ViewPagerAdapter;
 import com.frost.vkvideomanager.video.VideosFragment;
 import com.frost.vkvideomanager.wall.WallFragment;
@@ -31,7 +30,7 @@ public class CommunityActivity extends AppCompatActivity {
     public static final String COMMUNITY_NAME = "communityName";
     public static final String COMMUNITY_ID = "communityId";
 
-    private List<BaseFragment> fragments = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +51,7 @@ public class CommunityActivity extends AppCompatActivity {
         fragments.add(VideosFragment.newInstance(communityId, 0, false));
         fragments.add(WallFragment.newInstance(communityId));
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), this);
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
     }

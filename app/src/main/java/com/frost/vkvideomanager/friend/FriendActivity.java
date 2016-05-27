@@ -2,13 +2,12 @@ package com.frost.vkvideomanager.friend;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.ViewPagerAdapter;
 import com.frost.vkvideomanager.video.VideosFragment;
 import com.frost.vkvideomanager.wall.WallFragment;
@@ -31,7 +30,7 @@ public class FriendActivity extends AppCompatActivity {
     public static final String FRIEND_ID = "friendId";
     public static final String FRIEND_FULL_NAME = "friendFullName";
 
-    private List<BaseFragment> fragments = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +52,8 @@ public class FriendActivity extends AppCompatActivity {
         fragments.add(VideosFragment.newInstance(friendId, 0, false));
         fragments.add(WallFragment.newInstance(friendId));
 
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager());
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), this);
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
-//        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }

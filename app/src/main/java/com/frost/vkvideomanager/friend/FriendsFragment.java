@@ -4,16 +4,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.BaseFragment;
@@ -26,24 +22,10 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiUser;
 import com.vk.sdk.api.model.VKList;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
 public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemClickListener {
-
-    @Bind(R.id.rootView)
-    RelativeLayout rootView;
-    @Bind(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @Bind(R.id.progressBar)
-    ProgressBar progressBar;
-    @Bind(R.id.swipeRefresh)
-    SwipeRefreshLayout swipeRefresh;
-    @Bind(R.id.noConnectionView)
-    RelativeLayout noConnectionView;
-    @Bind(R.id.retryButton)
-    Button retryButton;
 
     private FriendAdapter friendAdapter;
     private VKList<VKApiUser> friendList = new VKList<>();
@@ -149,10 +131,6 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
         friendIntent.putExtra(FriendActivity.FRIEND_ID, friendId);
         friendIntent.putExtra(FriendActivity.FRIEND_FULL_NAME, friendFullName);
         startActivity(friendIntent);
-    }
-
-    public String getName() {
-        return "FRIENDS";
     }
 
 }

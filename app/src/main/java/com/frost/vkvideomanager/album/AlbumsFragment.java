@@ -6,26 +6,21 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.network.Parser;
+import com.frost.vkvideomanager.BaseFragment;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -36,31 +31,14 @@ import com.vk.sdk.api.VKResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
 public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemClickListener,
         EditAlbumDialogFragment.EditDialogListener {
 
-    @Bind(R.id.rootView)
-    RelativeLayout rootView;
-    @Bind(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @Bind(R.id.progressBar)
-    ProgressBar progressBar;
-    @Bind(R.id.swipeRefresh)
-    SwipeRefreshLayout swipeRefresh;
-    @Bind(R.id.noConnectionView)
-    RelativeLayout noConnectionView;
-    @Bind(R.id.retryButton)
-    Button retryButton;
-    @Bind(R.id.noVideosView)
-    TextView noVideosView;
-
     private List<Album> albumList = new ArrayList<>();
     private AlbumAdapter albumAdapter;
-    private boolean isCreated;
     private boolean noConnection;
     private boolean noAlbums;
 
@@ -85,16 +63,9 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
+        super.onViewCreated(view, savedInstanceState);
         albumAdapter = new AlbumAdapter(getActivity(), albumList, AlbumsFragment.this);
         recyclerView.setAdapter(albumAdapter);
-
-        if (isCreated) {
-            progressBar.setVisibility(View.VISIBLE);
-            isCreated = false;
-        } else {
-            progressBar.setVisibility(View.GONE);
-        }
 
         if (noConnection  && albumList.isEmpty()) {
             noConnectionView.setVisibility(View.VISIBLE);
@@ -271,11 +242,6 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
                 }
             });
         }
-    }
-
-    public String getName() {
-//        return getString(R.string.albums);
-        return "АЛЬБОМЫ";
     }
 
 }

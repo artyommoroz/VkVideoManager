@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -56,8 +57,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private VKApiUser vkApiUser;
     private Bundle state;
-    private String currentTitle;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,86 +104,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
         item.setChecked(true);
+        tabLayout.setVisibility(View.GONE);
 
-        if (id == R.id.nav_videos) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-//            if (fragmentManager.findFragmentByTag(TAG_CONTAINER) == null || state == null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        ContainerFragment.newInstance(), TAG_CONTAINER).commit();
-//            }
-            getSupportActionBar().setTitle(item.getTitle());
-        } else if (id == R.id.nav_friends) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            if (fragmentManager.findFragmentByTag(TAG_FRIENDS) == null || state == null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        FriendsFragment.newInstance(), TAG_FRIENDS).commit();
-            }
-            tabLayout.setVisibility(View.GONE);
-            getSupportActionBar().setTitle(item.getTitle());
-        } else if (id == R.id.nav_catalog) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            if (fragmentManager.findFragmentByTag(TAG_CATALOG) == null || state == null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        CatalogFragment.newInstance(), TAG_CATALOG).commit();
-            }
-            tabLayout.setVisibility(View.GONE);
-            getSupportActionBar().setTitle(item.getTitle());
-        } else if (id == R.id.nav_news) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            if (fragmentManager.findFragmentByTag(TAG_FEED) == null || state == null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        FeedFragment.newInstance(), TAG_FEED).commit();
-            }
-            tabLayout.setVisibility(View.GONE);
-            getSupportActionBar().setTitle(item.getTitle());
-        } else if (id == R.id.nav_communities) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            if (fragmentManager.findFragmentByTag(TAG_COMMUNITIES) == null || state == null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        CommunitiesFragment.newInstance(), TAG_COMMUNITIES).commit();
-            }
-            tabLayout.setVisibility(View.GONE);
-            getSupportActionBar().setTitle(item.getTitle());
-        } else if (id == R.id.nav_search) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            if (fragmentManager.findFragmentByTag(TAG_SEARCH) == null || state == null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content,
-                        SearchFragment.newInstance(), TAG_SEARCH).commit();
-            }
-            tabLayout.setVisibility(View.GONE);
-            getSupportActionBar().setTitle(item.getTitle());
-        } else if (id == R.id.nav_logout) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(R.string.logout_message)
-                    .setPositiveButton(R.string.video_dialog_delete_positive_button, (dialog, id1) -> {
-                        VKSdk.logout();
-                        finish();
-                        Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(logoutIntent);
-                    })
-                    .setNegativeButton(R.string.video_dialog_delete_negative_button, (dialog, id1) -> {
-                        dialog.cancel();
-                    });
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-            alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
-            alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
+        CharSequence title = null;
+        String tag = null;
+        Fragment fragment = null;
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        switch (item.getItemId()) {
+            case R.id.nav_videos:
+                title = item.getTitle();
+                tag = TAG_CONTAINER;
+                fragment = ContainerFragment.newInstance();
+                break;
+            case R.id.nav_news:
+                title = item.getTitle();
+                tag = TAG_FEED;
+                fragment = FeedFragment.newInstance();
+                break;
+            case R.id.nav_catalog:
+                title = item.getTitle();
+                tag = TAG_CATALOG;
+                fragment = CatalogFragment.newInstance();
+                break;
+            case R.id.nav_friends:
+                title = item.getTitle();
+                tag = TAG_FRIENDS;
+                fragment = FriendsFragment.newInstance();
+                break;
+            case R.id.nav_communities:
+                title = item.getTitle();
+                tag = TAG_COMMUNITIES;
+                fragment = CommunitiesFragment.newInstance();
+                break;
+            case R.id.nav_search:
+                title = item.getTitle();
+                tag = TAG_SEARCH;
+                fragment = SearchFragment.newInstance();
+                break;
+            case R.id.nav_logout:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(R.string.logout_message)
+                        .setPositiveButton(R.string.video_dialog_delete_positive_button, (dialog, id1) -> {
+                            VKSdk.logout();
+                            finish();
+                            Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+                            startActivity(logoutIntent);
+                        })
+                        .setNegativeButton(R.string.video_dialog_delete_negative_button, (dialog, id1) -> {
+                            dialog.cancel();
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources()
+                        .getColor(R.color.colorPrimary));
+                alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources()
+                        .getColor(R.color.colorPrimary));
+                break;
         }
+
+        toolbar.setTitle(title);
+
+        if (fragmentManager.findFragmentByTag(tag) == null || state == null) {
+            fragmentManager.beginTransaction().replace(R.id.content, fragment, tag).commit();
+        }
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

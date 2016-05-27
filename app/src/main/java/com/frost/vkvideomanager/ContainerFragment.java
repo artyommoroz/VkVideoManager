@@ -31,18 +31,17 @@ public class ContainerFragment extends Fragment {
     ViewPager viewPager;
     private FragmentManager retainedChildFragmentManager;
     private ViewPagerAdapter viewPagerAdapter;
-    private Field mHostField;
+    private Field hostField;
     private Class fragmentImplClass;
     private FragmentHostCallback currentHost;
 
-    private List<BaseFragment> fragments = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
 
     {
-        //Prepare the reflections to manage hiden fileds
         try {
             fragmentImplClass = Class.forName("android.support.v4.app.FragmentManagerImpl");
-            mHostField = fragmentImplClass.getDeclaredField("mHost");
-            mHostField.setAccessible(true);
+            hostField = fragmentImplClass.getDeclaredField("mHost");
+            hostField.setAccessible(true);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("FragmentManagerImpl is renamed due to the " +
                     "change of Android SDK, this workaround doesn't work any more. " +
@@ -86,7 +85,7 @@ public class ContainerFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
-        viewPagerAdapter = new ViewPagerAdapter(fragments, retainedChildFragmentManager);
+        viewPagerAdapter = new ViewPagerAdapter(fragments, retainedChildFragmentManager, getActivity());
         viewPager.setAdapter(viewPagerAdapter);
         TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
@@ -100,7 +99,7 @@ public class ContainerFragment extends Fragment {
             //created fragment
             try {
                 //Copy the mHost(Activity) to retainedChildFragmentManager
-                currentHost = (FragmentHostCallback) mHostField.get(getFragmentManager());
+                currentHost = (FragmentHostCallback) hostField.get(getFragmentManager());
                 Field childFMField = Fragment.class.getDeclaredField("mChildFragmentManager");
                 childFMField.setAccessible(true);
                 childFMField.set(this, retainedChildFragmentManager);
@@ -148,15 +147,8 @@ public class ContainerFragment extends Fragment {
 
     private void replaceFragmentManagerHost(FragmentManager fragmentManager) throws IllegalAccessException {
         if (currentHost != null) {
-            mHostField.set(fragmentManager, currentHost);
+            hostField.set(fragmentManager, currentHost);
         }
-    }
-
-    private FragmentManager getMyChildFragmentManager() {
-        if(retainedChildFragmentManager == null) {
-            retainedChildFragmentManager = getChildFragmentManager();
-        }
-        return retainedChildFragmentManager;
     }
 
 }

@@ -1,14 +1,11 @@
 package com.frost.vkvideomanager.catalog;
 
 
-import com.frost.vkvideomanager.album.Album;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class CatalogSection {
 
@@ -18,7 +15,6 @@ public class CatalogSection {
     private String icon;
     private String next;
     private VKList<VKApiVideo> videoList = new VKList<>();
-    private List<Album> albumList = new ArrayList<>();
 
     public CatalogSection(JSONObject from) {
         id = from.optString("id");
@@ -58,14 +54,6 @@ public class CatalogSection {
 
     public void setVideoList(VKList<VKApiVideo> videoList) {
         this.videoList = videoList;
-    }
-
-    public List<Album> getAlbumList() {
-        return albumList;
-    }
-
-    public void setAlbumList(List<Album> albumList) {
-        this.albumList = albumList;
     }
 
 }
