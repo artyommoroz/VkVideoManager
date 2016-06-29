@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.frost.vkvideomanager.R;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.BaseFragment;
 import com.vk.sdk.api.VKApi;
@@ -39,7 +40,6 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
 
     private List<Album> albumList = new ArrayList<>();
     private AlbumAdapter albumAdapter;
-    private boolean noConnection;
     private boolean noAlbums;
 
     public AlbumsFragment() {}
@@ -52,7 +52,6 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         updateAlbumList();
-        isCreated = true;
     }
 
     @Override
@@ -64,13 +63,9 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        albumAdapter = new AlbumAdapter(getActivity(), albumList, AlbumsFragment.this);
-        recyclerView.setAdapter(albumAdapter);
 
-        if (noConnection  && albumList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && albumList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
+        if (NetworkChecker.isOnline(getActivity())) {
+            recyclerView.setAdapter(albumAdapter);
         }
 
         if (noAlbums) {
@@ -81,12 +76,8 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
         }
 
         int orientation = getActivity().getResources().getConfiguration().orientation;
-        RecyclerView.LayoutManager layoutManager = null;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layoutManager = new LinearLayoutManager(getActivity());
-        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            layoutManager = new GridLayoutManager(getActivity(), 2);
-        }
+        RecyclerView.LayoutManager layoutManager = orientation == Configuration.ORIENTATION_PORTRAIT ?
+                new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(layoutManager);
 
         swipeRefresh.setOnRefreshListener(() -> updateAlbumList());
@@ -107,7 +98,6 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 if (albumList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (albumList.size() > 0){
@@ -147,26 +137,22 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
             albumIntent.putExtra(AlbumActivity.IS_MY, true);
             startActivity(albumIntent);
         } else if (v instanceof ImageButton) {
-            showPopupMenu(v, position);
+            PopupMenu popupMenu = new PopupMenu(getActivity(), v);
+            popupMenu.inflate(R.menu.popup_menu_album);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.edit:
+                        editAlbum(position);
+                        return true;
+                    case R.id.delete:
+                        deleteAlbum(position);
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+            popupMenu.show();
         }
-    }
-
-    private void showPopupMenu(View v, final int position) {
-        PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-        popupMenu.inflate(R.menu.popup_menu_album);
-        popupMenu.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.edit:
-                    editAlbum(position);
-                    return true;
-                case R.id.delete:
-                    deleteAlbum(position);
-                    return true;
-                default:
-                    return false;
-            }
-        });
-        popupMenu.show();
     }
 
     private void editAlbum(int position) {
@@ -207,8 +193,10 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
                         });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
-        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
+        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources()
+                .getColor(R.color.colorPrimary));
+        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources()
+                .getColor(R.color.colorPrimary));
     }
 
     @Override

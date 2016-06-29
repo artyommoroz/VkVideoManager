@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.network.AdditionRequests;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
@@ -34,7 +35,6 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
     private VideoAdapter videoAdapter;
     private VKList<VKApiVideo> videoList = new VKList<>();
     private int offset;
-    private boolean noConnection;
     private boolean noVideos;
 
     public FavoritesFragment() {}
@@ -47,19 +47,14 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         updateVideoList();
-        isCreated = true;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        videoAdapter = new VideoAdapter(getActivity(), videoList, FavoritesFragment.this);
-        recyclerView.setAdapter(videoAdapter);
 
-        if (noConnection  && videoList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && videoList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
+        if (NetworkChecker.isOnline(getActivity())) {
+            recyclerView.setAdapter(videoAdapter);
         }
 
         if (noVideos) {
@@ -110,7 +105,6 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
                 noConnectionView.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
                 swipeRefresh.setRefreshing(false);
-                noConnection = true;
             }
 
             @Override
@@ -133,7 +127,6 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 if (videoList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (videoList.size() > 0){

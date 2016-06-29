@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.MainActivity;
 import com.frost.vkvideomanager.network.AdditionRequests;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
@@ -38,7 +39,6 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
     private WallAdapter wallAdapter;
     private int offset = 100;
     private int ownerId;
-    private boolean noConnection;
     private boolean noVideos;
 
     public WallFragment() {}
@@ -54,27 +54,20 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             ownerId = getArguments().getInt(OWNER_ID);
         }
-        if(!(getActivity() instanceof MainActivity)) {
-            setRetainInstance(true);
-        }
 
         updateWallVideoList();
-        isCreated = true;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        wallAdapter = new WallAdapter(getActivity(), wallVideoList, WallFragment.this);
-        recyclerView.setAdapter(wallAdapter);
 
-        if (noConnection  && wallVideoList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && wallVideoList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
+        if (NetworkChecker.isOnline(getActivity())) {
+            recyclerView.setAdapter(wallAdapter);
         }
 
         if (noVideos) {
@@ -108,7 +101,7 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
             }
         });
 
-        swipeRefresh.setOnRefreshListener(() -> updateWallVideoList());
+        swipeRefresh.setOnRefreshListener(this::updateWallVideoList);
 
         retryButton.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
@@ -127,7 +120,6 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 if (wallVideoList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (wallVideoList.size() > 0){
@@ -169,8 +161,7 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
                 public void onComplete(VKResponse response) {
                     super.onComplete(response);
                     VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
-                    String videoUri = vkApiVideo.player;
-                    UrlHelper.playVideo(getActivity(), videoUri);
+                    UrlHelper.playVideo(getActivity(), vkApiVideo.player);
                 }
             });
         } else if (v instanceof ImageButton) {

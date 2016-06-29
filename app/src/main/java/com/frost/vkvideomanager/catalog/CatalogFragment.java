@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.R;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.frost.vkvideomanager.BaseFragment;
@@ -28,25 +29,11 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 
 public class CatalogFragment extends BaseFragment {
 
-//    @Bind(R.id.rootView)
-//    RelativeLayout rootView;
-//    @Bind(R.id.recyclerView)
-//    RecyclerView recyclerView;
-//    @Bind(R.id.progressBar)
-//    ProgressBar progressBar;
-//    @Bind(R.id.swipeRefresh)
-//    SwipeRefreshLayout swipeRefresh;
-//    @Bind(R.id.noConnectionView)
-//    RelativeLayout noConnectionView;
-//    @Bind(R.id.retryButton)
-//    Button retryButton;
-
     private static final String CATALOG_REQUEST = "video.getCatalog";
 
     private SectionedRecyclerViewAdapter sectionAdapter;
     private List<CatalogSection> catalogSectionList = new ArrayList<>();
     private String next;
-    private boolean noConnection;
 
     public CatalogFragment() {}
 
@@ -69,17 +56,10 @@ public class CatalogFragment extends BaseFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
+        super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
-            progressBar.setVisibility(View.GONE);
+        if (NetworkChecker.isOnline(getActivity())) {
             recyclerView.setAdapter(sectionAdapter);
-        }
-
-        if (noConnection  && catalogSectionList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && catalogSectionList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
         }
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -89,7 +69,6 @@ public class CatalogFragment extends BaseFragment {
             public void onLoadMore(int page, int totalItemsCount) {
                 VKRequest catalogRequest = new VKRequest(CATALOG_REQUEST, VKParameters.from(
                         VKApiConst.COUNT, 16,
-                        VKApiConst.CATALOG_ITEMS_COUNT, 10,
                         VKApiConst.CATALOG_FROM, next,
                         VKApiConst.EXTENDED, 1,
                         VKApiConst.FILTERS, "other"));
@@ -130,16 +109,14 @@ public class CatalogFragment extends BaseFragment {
     private void updateCatalog() {
         final VKRequest catalogRequest = new VKRequest(CATALOG_REQUEST, VKParameters.from(
                 VKApiConst.COUNT, 16,
-                VKApiConst.CATALOG_ITEMS_COUNT, 10,
                 VKApiConst.EXTENDED, 1,
-                VKApiConst.FILTERS, "other, ugc, top"));
+                VKApiConst.FILTERS, "other, ugc"));
         catalogRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onError(VKError error) {
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 if (catalogSectionList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (catalogSectionList.size() > 0){

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.BaseFragment;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -29,7 +30,6 @@ public class CommunitiesFragment extends BaseFragment implements CommunityAdapte
 
     private CommunityAdapter communityAdapter;
     private VKList<VKApiCommunity> communityList = new VKList<>();
-    private boolean noConnection;
 
     public CommunitiesFragment() {}
 
@@ -44,33 +44,16 @@ public class CommunitiesFragment extends BaseFragment implements CommunityAdapte
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setRetainInstance(true);
-        return inflater.inflate(R.layout.fragment_list, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
-        if (savedInstanceState != null) {
-            progressBar.setVisibility(View.GONE);
-            communityAdapter = new CommunityAdapter(getActivity(), communityList, CommunitiesFragment.this);
+        super.onViewCreated(view, savedInstanceState);
+
+        if (NetworkChecker.isOnline(getActivity())) {
             recyclerView.setAdapter(communityAdapter);
         }
 
-        if (noConnection  && communityList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && communityList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
-        }
-
         int orientation = getActivity().getResources().getConfiguration().orientation;
-        RecyclerView.LayoutManager layoutManager = null;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layoutManager = new LinearLayoutManager(getActivity());
-        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            layoutManager = new GridLayoutManager(getActivity(), 2);
-        }
+        RecyclerView.LayoutManager layoutManager = orientation == Configuration.ORIENTATION_PORTRAIT ?
+                new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(layoutManager);
 
         swipeRefresh.setOnRefreshListener(() -> updateCommunityList());
@@ -91,7 +74,6 @@ public class CommunitiesFragment extends BaseFragment implements CommunityAdapte
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 if (communityList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (communityList.size() > 0){
@@ -127,5 +109,4 @@ public class CommunitiesFragment extends BaseFragment implements CommunityAdapte
         communityIntent.putExtra(CommunityActivity.COMMUNITY_NAME, communityList.get(position).name);
         startActivity(communityIntent);
     }
-
 }

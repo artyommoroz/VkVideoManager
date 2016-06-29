@@ -68,7 +68,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
             moreButton.setOnClickListener(this);
-        }
+        }   
 
         @Override
         public void onClick(View v) {

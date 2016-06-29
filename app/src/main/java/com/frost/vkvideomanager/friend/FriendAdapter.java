@@ -38,8 +38,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public void onBindViewHolder(FriendViewHolder holder, int position) {
-        holder.name.setText(String.format("%s %s", friendList.get(position).first_name, friendList.get(position).last_name));
-        Picasso.with(context).load(friendList.get(position).photo_100).fit().centerCrop()
+        VKApiUser friend = friendList.get(position);
+        holder.name.setText(String.format("%s %s", friend.first_name, friend.last_name));
+        Picasso.with(context).load(friend.photo_100).fit().centerCrop()
                 .transform(new CircleTransform()).into(holder.avatar);
     }
 

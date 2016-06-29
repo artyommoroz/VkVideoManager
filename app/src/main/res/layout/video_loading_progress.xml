@@ -22,4 +22,4 @@
            android:text="@string/loading_video"
            android:textSize="14sp"
            android:textColor="?android:attr/textColorPrimary" />
- </LinearLayout>
+</LinearLayout>

@@ -108,23 +108,15 @@ public class CatalogSectionAdapter extends StatelessSection {
         return new HeaderViewHolder(view);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
         HeaderViewHolder headerHolder = (HeaderViewHolder) holder;
-        switch (catalogSection.getId()) {
-            case "ugc":
-                headerHolder.icon.setImageResource(R.drawable.ic_whatshot_white_24dp);
-                break;
-            case "top":
-                headerHolder.icon.setImageResource(R.drawable.ic_star_white_24dp);
-                break;
-            default:
-                Picasso.with(context).load(catalogSection.getIcon()).fit().centerCrop()
-                        .transform(new CircleTransform()).into(headerHolder.icon);
-                break;
+        if (catalogSection.getId().equals("ugc")) {
+            headerHolder.icon.setImageResource(R.drawable.ic_whatshot_white_24dp);
+        } else {
+            Picasso.with(context).load(catalogSection.getIcon()).fit().centerCrop()
+                    .transform(new CircleTransform()).into(headerHolder.icon);
         }
-
         headerHolder.name.setText(catalogSection.getName());
         headerHolder.icon.setOnClickListener(v -> {
             if (catalogSection.getType().equals("channel")) {

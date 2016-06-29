@@ -22,7 +22,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHolder> {
+public class WallAdapter extends RecyclerView.Adapter<WallAdapter.WallVideoViewHolder> {
 
     private List<WallVideo> wallVideoList = new ArrayList<>();
     private Context context;
@@ -35,21 +35,22 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
     }
 
     @Override
-    public NewsFeedViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public WallVideoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_wall_post, parent, false);
-        return new NewsFeedViewHolder(view);
+        return new WallVideoViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(NewsFeedViewHolder holder, int position) {
-        holder.name.setText(wallVideoList.get(position).getName());
-        Picasso.with(context).load(wallVideoList.get(position).getIcon()).fit().centerCrop()
+    public void onBindViewHolder(WallVideoViewHolder holder, int position) {
+        WallVideo wallVideo = wallVideoList.get(position);
+        holder.name.setText(wallVideo.getName());
+        Picasso.with(context).load(wallVideo.getIcon()).fit().centerCrop()
                 .transform(new CircleTransform()).into(holder.icon);
-        holder.date.setText(TimeConverter.getFormattedDate(wallVideoList.get(position).getDate()));
-        holder.duration.setText(TimeConverter.secondsToHHmmss(wallVideoList.get(position).getVideo().duration));
-        holder.title.setText(wallVideoList.get(position).getVideo().title);
-        Picasso.with(context).load(wallVideoList.get(position).getVideo().photo_320)
-                .fit().centerCrop().into(holder.imageVideo);
+        holder.date.setText(TimeConverter.getFormattedDate(wallVideo.getDate()));
+        holder.duration.setText(TimeConverter.secondsToHHmmss(wallVideo.getVideo().duration));
+        holder.title.setText(wallVideo.getVideo().title);
+        Picasso.with(context).load(wallVideo.getVideo().photo_320).fit().centerCrop()
+                .into(holder.imageVideo);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
     }
 
 
-    public class NewsFeedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class WallVideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @Bind(R.id.title)
         TextView title;
@@ -77,7 +78,7 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.NewsFeedViewHo
         @Bind(R.id.rootView)
         CardView rootView;
 
-        public NewsFeedViewHolder(View itemView) {
+        public WallVideoViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             rootView.setOnClickListener(this);

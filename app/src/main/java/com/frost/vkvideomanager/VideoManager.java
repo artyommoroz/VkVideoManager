@@ -27,7 +27,6 @@ public class VideoManager extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(this);
     }

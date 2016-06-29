@@ -7,12 +7,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.BaseFragment;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
@@ -29,7 +28,6 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
 
     private FriendAdapter friendAdapter;
     private VKList<VKApiUser> friendList = new VKList<>();
-    private boolean noConnection;
 
     public FriendsFragment() {}
 
@@ -44,33 +42,16 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setRetainInstance(true);
-        return inflater.inflate(R.layout.fragment_list, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
-        if (savedInstanceState != null) {
-            progressBar.setVisibility(View.GONE);
-            friendAdapter = new FriendAdapter(getActivity(), friendList, FriendsFragment.this);
+        super.onViewCreated(view, savedInstanceState);
+
+        if (NetworkChecker.isOnline(getActivity())) {
             recyclerView.setAdapter(friendAdapter);
         }
 
-        if (noConnection  && friendList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && friendList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
-        }
-
         int orientation = getActivity().getResources().getConfiguration().orientation;
-        RecyclerView.LayoutManager layoutManager = null;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layoutManager = new LinearLayoutManager(getActivity());
-        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            layoutManager = new GridLayoutManager(getActivity(), 3);
-        }
+        RecyclerView.LayoutManager layoutManager = orientation == Configuration.ORIENTATION_PORTRAIT ?
+                new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 3);
         recyclerView.setLayoutManager(layoutManager);
 
         swipeRefresh.setOnRefreshListener(() -> updateFriendList());
@@ -93,7 +74,6 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 if (friendList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (friendList.size() > 0){
@@ -132,5 +112,7 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
         friendIntent.putExtra(FriendActivity.FRIEND_FULL_NAME, friendFullName);
         startActivity(friendIntent);
     }
+
+
 
 }

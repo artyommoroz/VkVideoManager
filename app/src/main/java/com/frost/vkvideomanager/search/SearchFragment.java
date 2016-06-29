@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.network.AdditionRequests;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
@@ -45,7 +46,6 @@ public class SearchFragment extends BaseFragment implements VideoAdapter.ItemCli
     private int adult = 0;
     private int sort = 2;
     private String duration = "";
-    private boolean noConnection;
 
     public SearchFragment() {}
 
@@ -54,31 +54,17 @@ public class SearchFragment extends BaseFragment implements VideoAdapter.ItemCli
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setRetainInstance(true);
-        return inflater.inflate(R.layout.fragment_list, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
+        super.onViewCreated(view, savedInstanceState);
+        setHasOptionsMenu(true);
 
-        if (savedInstanceState != null) {
-            progressBar.setVisibility(View.GONE);
-            videoAdapter = new VideoAdapter(getActivity(), videoList, SearchFragment.this);
+        if (NetworkChecker.isOnline(getActivity())) {
             recyclerView.setAdapter(videoAdapter);
-        }
-
-        if (noConnection && videoList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && videoList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
         }
 
         progressBar.setVisibility(View.GONE);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
@@ -113,18 +99,12 @@ public class SearchFragment extends BaseFragment implements VideoAdapter.ItemCli
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.onActionViewExpanded();
-        searchView.setMaxWidth(800);
+        searchView.setMaxWidth(700);
         searchView.setOnQueryTextListener(this);
 
         MenuItem parametersItem = menu.findItem(R.id.action_parameters);
@@ -208,7 +188,6 @@ public class SearchFragment extends BaseFragment implements VideoAdapter.ItemCli
                 super.onError(error);
                 swipeRefresh.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
-                noConnection = true;
                 noConnectionView.setVisibility(View.VISIBLE);
             }
 

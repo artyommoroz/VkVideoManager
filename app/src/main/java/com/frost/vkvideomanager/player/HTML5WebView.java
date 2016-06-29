@@ -19,6 +19,7 @@ import com.frost.vkvideomanager.R;
 
 
 public class HTML5WebView extends WebView {
+
     private Context context;
     private MyWebChromeClient webChromeClient;
     private View customView;

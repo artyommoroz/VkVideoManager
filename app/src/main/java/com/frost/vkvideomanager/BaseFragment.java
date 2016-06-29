@@ -15,6 +15,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+import com.frost.vkvideomanager.network.NetworkChecker;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -35,10 +37,11 @@ public class BaseFragment extends Fragment {
     @Bind(R.id.noVideosView)
     protected TextView noVideosView;
 
-    protected boolean isCreated;
+    public BaseFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setRetainInstance(true);
         return inflater.inflate(R.layout.fragment_list, container, false);
     }
 
@@ -46,11 +49,14 @@ public class BaseFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         ButterKnife.bind(this, view);
 
-        if (isCreated) {
-            progressBar.setVisibility(View.VISIBLE);
-            isCreated = false;
-        } else {
+        if (savedInstanceState != null) {
             progressBar.setVisibility(View.GONE);
+        }
+
+        if (NetworkChecker.isOnline(getActivity())) {
+            noConnectionView.setVisibility(View.GONE);
+        } else {
+            noConnectionView.setVisibility(View.VISIBLE);
         }
     }
 

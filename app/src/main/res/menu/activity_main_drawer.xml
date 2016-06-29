@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <group
         android:id="@+id/group1"
@@ -26,6 +25,10 @@
             android:id="@+id/nav_communities"
             android:icon="@drawable/ic_people_white"
             android:title="@string/drawer_item_communities" />
+        <item
+            android:id="@+id/nav_favorites"
+            android:icon="@drawable/ic_bookmark_white_24px"
+            android:title="@string/drawer_item_favorites" />
         <item
             android:id="@+id/nav_search"
             android:icon="@drawable/ic_search_white_24dp"

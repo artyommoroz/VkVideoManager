@@ -24,6 +24,8 @@ import com.frost.vkvideomanager.feed.FeedFragment;
 import com.frost.vkvideomanager.friend.FriendsFragment;
 import com.frost.vkvideomanager.search.SearchFragment;
 import com.frost.vkvideomanager.utils.CircleTransform;
+import com.frost.vkvideomanager.video.FavoritesFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKApi;
@@ -53,10 +55,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG_CATALOG = "catalog";
     private static final String TAG_FRIENDS = "friends";
     private static final String TAG_COMMUNITIES = "communities";
+    private static final String TAG_FAVORITES = "favorites";
     private static final String TAG_SEARCH = "search";
+    private static final String TITLE = "title";
 
     private VKApiUser vkApiUser;
     private Bundle state;
+    private CharSequence title;
+    private FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         View header = navigationView.getHeaderView(0);
         final ImageView headerImage = (ImageView) header.findViewById(R.id.icon);
@@ -96,6 +104,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putCharSequence(TITLE, title);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        title = savedInstanceState.getCharSequence(TITLE);
+        getSupportActionBar().setTitle(title);
+    }
+
+    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
@@ -110,11 +131,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         item.setChecked(true);
         tabLayout.setVisibility(View.GONE);
 
-        CharSequence title = null;
         String tag = null;
         Fragment fragment = null;
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
         switch (item.getItemId()) {
             case R.id.nav_videos:
                 title = item.getTitle();
@@ -146,7 +165,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 tag = TAG_SEARCH;
                 fragment = SearchFragment.newInstance();
                 break;
+            case R.id.nav_favorites:
+                title = item.getTitle();
+                tag = TAG_FAVORITES;
+                fragment = FavoritesFragment.newInstance();
+                break;
             case R.id.nav_logout:
+                fragment = null;
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(R.string.logout_message)
                         .setPositiveButton(R.string.video_dialog_delete_positive_button, (dialog, id1) -> {
@@ -167,9 +192,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
 
-        toolbar.setTitle(title);
+        getSupportActionBar().setTitle(title);
 
-        if (fragmentManager.findFragmentByTag(tag) == null || state == null) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if ((fragmentManager.findFragmentByTag(tag) == null || state == null) && fragment != null) {
             fragmentManager.beginTransaction().replace(R.id.content, fragment, tag).commit();
         }
 

@@ -37,12 +37,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     @Override
     public void onBindViewHolder(AlbumViewHolder holder, int position) {
-        holder.title.setText(albumList.get(position).getTitle());
-        holder.count.setText(context.getString(R.string.album_number_of_videos, albumList.get(position).getCount()));
-        if (albumList.get(position).getCount() > 0) {
-            Picasso.with(context).load(albumList.get(position).getPhoto()).fit().centerCrop().into(holder.image);
-            if (albumList.get(position).getPrivacy().equals("only_me")
-                    || albumList.get(position).getPrivacy().equals("nobody")) {
+        Album album = albumList.get(position);
+        holder.title.setText(album.getTitle());
+        holder.count.setText(context.getString(R.string.album_number_of_videos, album.getCount()));
+        if (album.getCount() > 0) {
+            Picasso.with(context).load(album.getPhoto()).fit().centerCrop().into(holder.image);
+            if (album.getPrivacy().equals("only_me") || album.getPrivacy().equals("nobody")) {
                 holder.privacy.setVisibility(View.VISIBLE);
             }
         }

@@ -10,7 +10,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     public static final String VIDEO_URL = "videoUrl";
 
-    HTML5WebView webView;
+    private HTML5WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

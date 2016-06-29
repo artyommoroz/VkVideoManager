@@ -36,8 +36,6 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 return context.getString(R.string.fragment_wall);
             case "AlbumsFragment":
                 return context.getString(R.string.fragment_albums);
-            case "FavoritesFragment":
-                return context.getString(R.string.fragment_favorites);
             default:
                 return context.getString(R.string.fragment_videos);
         }

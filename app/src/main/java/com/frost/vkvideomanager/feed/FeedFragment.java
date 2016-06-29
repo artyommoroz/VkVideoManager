@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.R;
+import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
 import com.frost.vkvideomanager.BaseFragment;
@@ -27,26 +28,12 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 
 public class FeedFragment extends BaseFragment {
 
-//    @Bind(R.id.rootView)
-//    RelativeLayout rootView;
-//    @Bind(R.id.recyclerView)
-//    RecyclerView recyclerView;
-//    @Bind(R.id.progressBar)
-//    ProgressBar progressBar;
-//    @Bind(R.id.swipeRefresh)
-//    SwipeRefreshLayout swipeRefresh;
-//    @Bind(R.id.noConnectionView)
-//    RelativeLayout noConnectionView;
-//    @Bind(R.id.retryButton)
-//    Button retryButton;
-
     private static final String NEWSFEED_REQUEST = "newsfeed.get";
 
     private List<FeedSection> feedSectionList = new ArrayList<>();
     private SectionedRecyclerViewAdapter sectionAdapter;
     private String startFrom;
     private String startFromFirst;
-    private boolean noConnection;
 
     public FeedFragment() {}
 
@@ -61,25 +48,11 @@ public class FeedFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        setRetainInstance(true);
-        return inflater.inflate(R.layout.fragment_list, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        ButterKnife.bind(this, view);
+        super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState != null) {
-            progressBar.setVisibility(View.GONE);
+        if (NetworkChecker.isOnline(getActivity())) {
             recyclerView.setAdapter(sectionAdapter);
-        }
-
-        if (noConnection  && feedSectionList.isEmpty()) {
-            noConnectionView.setVisibility(View.VISIBLE);
-        } else if (!noConnection  && feedSectionList.size() > 0) {
-            noConnectionView.setVisibility(View.GONE);
         }
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -133,7 +106,6 @@ public class FeedFragment extends BaseFragment {
                 super.onError(error);
                 progressBar.setVisibility(View.GONE);
                 swipeRefresh.setRefreshing(false);
-                noConnection = true;
                 if (feedSectionList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
                 } else if (feedSectionList.size() > 0){

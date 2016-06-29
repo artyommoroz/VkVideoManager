@@ -34,10 +34,10 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 public class FeedSectionAdapter extends StatelessSection {
 
-    FeedSection feedSection;
-    Context context;
-    VKList<VKApiVideo> videoList = new VKList<>();
-    FragmentManager fragmentManager;
+    private FeedSection feedSection;
+    private Context context;
+    private VKList<VKApiVideo> videoList = new VKList<>();
+    private FragmentManager fragmentManager;
 
     public FeedSectionAdapter(Context context, FeedSection feedSection, FragmentManager fragmentManager) {
         super(R.layout.feed_section_header, R.layout.feed_section_footer, R.layout.item_video_big);
