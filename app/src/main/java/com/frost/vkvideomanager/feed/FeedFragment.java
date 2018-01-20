@@ -3,9 +3,7 @@ package com.frost.vkvideomanager.feed;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.network.NetworkChecker;
@@ -23,14 +21,13 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 public class FeedFragment extends BaseFragment {
 
     private static final String NEWSFEED_REQUEST = "newsfeed.get";
 
-    private List<FeedSection> feedSectionList = new ArrayList<>();
+    private List<FeedSectionModel> feedSectionModelList = new ArrayList<>();
     private SectionedRecyclerViewAdapter sectionAdapter;
     private String startFrom;
     private String startFromFirst;
@@ -74,14 +71,14 @@ public class FeedFragment extends BaseFragment {
                             e.printStackTrace();
                         }
                         if (!startFrom.equals(startFromFirst)) {
-                            List<FeedSection> loadedFeedSectionList = Parser.parseNewsFeed(response);
-                            for (int i = 0; i < loadedFeedSectionList.size(); i++) {
-                                FeedSectionAdapter feedSectionAdapter = new FeedSectionAdapter(getActivity(),
-                                        loadedFeedSectionList.get(i), getFragmentManager());
-                                sectionAdapter.addSection(feedSectionAdapter);
+                            List<FeedSectionModel> loadedFeedSectionModelList = Parser.parseNewsFeed(response);
+                            for (int i = 0; i < loadedFeedSectionModelList.size(); i++) {
+                                FeedSection feedSection = new FeedSection(getActivity(),
+                                        loadedFeedSectionModelList.get(i), getFragmentManager());
+                                sectionAdapter.addSection(feedSection);
                             }
                             int curSize = sectionAdapter.getItemCount();
-                            sectionAdapter.notifyItemRangeInserted(curSize, feedSectionList.size() - 1);
+                            sectionAdapter.notifyItemRangeInserted(curSize, feedSectionModelList.size() - 1);
                         }
                     }
                 });
@@ -97,18 +94,17 @@ public class FeedFragment extends BaseFragment {
     }
 
     private void updateFeed() {
-        VKRequest feedRequest = new VKRequest(NEWSFEED_REQUEST, VKParameters.from(
-                VKApiConst.FILTERS, "video",
-                VKApiConst.COUNT, 100));
+        VKRequest feedRequest = new VKRequest(NEWSFEED_REQUEST,
+                VKParameters.from(VKApiConst.FILTERS, "video", VKApiConst.COUNT, 100));
         feedRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onError(VKError error) {
                 super.onError(error);
                 progressBar.setVisibility(View.GONE);
                 swipeRefresh.setRefreshing(false);
-                if (feedSectionList.isEmpty()) {
+                if (feedSectionModelList.isEmpty()) {
                     noConnectionView.setVisibility(View.VISIBLE);
-                } else if (feedSectionList.size() > 0){
+                } else if (feedSectionModelList.size() > 0){
                     Snackbar.make(rootView, getString(R.string.no_connection_snack_message), Snackbar.LENGTH_LONG)
                             .setAction(getString(R.string.no_connection_snack_button), view -> {
                                 updateFeed();
@@ -122,19 +118,19 @@ public class FeedFragment extends BaseFragment {
                 noConnectionView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 swipeRefresh.setRefreshing(false);
-                feedSectionList.clear();
+                feedSectionModelList.clear();
                 try {
                     startFromFirst = response.json.optJSONObject("response").getString("next_from");
                     startFrom = response.json.optJSONObject("response").getString("next_from");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                feedSectionList = Parser.parseNewsFeed(response);
+                feedSectionModelList = Parser.parseNewsFeed(response);
                 sectionAdapter = new SectionedRecyclerViewAdapter();
-                for (int i = 0; i < feedSectionList.size(); i++) {
-                    FeedSectionAdapter feedSectionAdapter = new FeedSectionAdapter(getActivity(),
-                            feedSectionList.get(i), getFragmentManager());
-                    sectionAdapter.addSection(feedSectionAdapter);
+                for (int i = 0; i < feedSectionModelList.size(); i++) {
+                    FeedSection feedSection = new FeedSection(getActivity(),
+                            feedSectionModelList.get(i), getFragmentManager());
+                    sectionAdapter.addSection(feedSection);
                 }
                 recyclerView.setAdapter(sectionAdapter);
             }

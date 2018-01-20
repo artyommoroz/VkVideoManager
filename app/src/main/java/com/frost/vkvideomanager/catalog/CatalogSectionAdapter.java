@@ -30,6 +30,8 @@ import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
 
+import java.util.Locale;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
@@ -39,7 +41,8 @@ public class CatalogSectionAdapter extends StatelessSection {
 
     private CatalogSection catalogSection;
     private Context context;
-    private VKList<VKApiVideo> videoList;
+//    private VKList<VKApiVideo> videoList;
+    private VKApiVideo video;
     private boolean expanded;
 
     public CatalogSectionAdapter(Context context, CatalogSection catalogSection) {
@@ -61,27 +64,40 @@ public class CatalogSectionAdapter extends StatelessSection {
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
         ItemViewHolder itemHolder = (ItemViewHolder) holder;
-        videoList = catalogSection.getVideoList();
-        itemHolder.title.setText(videoList.get(position).title);
-        itemHolder.duration.setText(TimeConverter.secondsToHHmmss(videoList.get(position).duration));
-        itemHolder.views.setText(TimeConverter.getViewsWithRightEnding(videoList.get(position).views));
-        Picasso.with(context).load(videoList.get(position).photo_320).fit().centerCrop().into(itemHolder.imageVideo);
-        itemHolder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                VKRequest videoRequest = VKApi.video().get(VKParameters.from(
-                        VKApiConst.VIDEOS, videoList.get(position).owner_id + "_" + videoList.get(position).id));
-                videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-                        VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
-                        String videoUri = vkApiVideo.player;
-                        UrlHelper.playVideo(context, videoUri);
-                    }
-                });
+//        videoList = catalogSection.getVideoList();
+        if (catalogSection.getVideoList().size() > 1) {
+            video = catalogSection.getVideoList().get(position);
+        }
+        if (video != null) {
+            itemHolder.title.setText(video.title);
+            itemHolder.duration.setText(TimeConverter.secondsToHHmmss(video.duration));
+            if (Locale.getDefault().getLanguage().equals("ru")
+                    || Locale.getDefault().getLanguage().equals("ua")
+                    || Locale.getDefault().getLanguage().equals("by")
+                    || Locale.getDefault().getLanguage().equals("kz")) {
+                itemHolder.views.setText(TimeConverter.getViewsWithRightEnding(video.views));
+            } else {
+                itemHolder.views.setText(String.format(context.getString(R.string.video_views), video.views));
             }
-        });
+            itemHolder.views.setText(TimeConverter.getViewsWithRightEnding(video.views));
+            Picasso.with(context).load(video.photo_320).fit().centerCrop().into(itemHolder.imageVideo);
+            itemHolder.rootView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    VKRequest videoRequest = VKApi.video().get(VKParameters.from(
+                            VKApiConst.VIDEOS, video.owner_id + "_" + video.id));
+                    videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
+                        @Override
+                        public void onComplete(VKResponse response) {
+                            super.onComplete(response);
+                            VKApiVideo vkApiVideo = ((VKList<VKApiVideo>) response.parsedModel).get(0);
+                            String videoUri = vkApiVideo.player;
+                            UrlHelper.playVideo(context, videoUri);
+                        }
+                    });
+                }
+            });
+        }
 
         itemHolder.moreButton.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(context, v);
@@ -89,11 +105,11 @@ public class CatalogSectionAdapter extends StatelessSection {
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.add:
-                        AdditionRequests.addVideo(context, videoList.get(position));
+                        AdditionRequests.addVideo(context, video);
                         return true;
                     case R.id.add_to_album:
                         AdditionRequests.addVideoToAlbum(((MainActivity) context).getSupportFragmentManager(),
-                                videoList.get(position));
+                                video);
                         return true;
                     default:
                         return false;

@@ -3,11 +3,15 @@ package com.frost.vkvideomanager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
+import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
@@ -18,19 +22,36 @@ public class LoginActivity extends AppCompatActivity {
 
     @Bind(R.id.loginButton)
     Button loginButton;
+    @Bind(R.id.videocamView)
+    ImageView videocamView;
+
+    private static final String[] myScope;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-        loginButton.setOnClickListener(v -> VKSdk.login(LoginActivity.this, "friends,video,wall,groups"));
+
+        Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.videocam_scale);
+//        videocamView.startAnimation(scaleAnimation);
+
+//        loginButton.setOnClickListener(v -> VKSdk.login(LoginActivity.this, "friends,video,wall,groups," + VKScope.NOHTTPS));
+        loginButton.startAnimation(scaleAnimation);
+        loginButton.setOnClickListener(v -> VKSdk.login(LoginActivity.this, myScope));
 
         if (VKSdk.isLoggedIn()) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         }
+    }
+
+    static {
+        myScope = new String[]{VKScope.VIDEO, VKScope.GROUPS, VKScope.FRIENDS,
+                VKScope.WALL, VKScope.OFFLINE, VKScope.NOHTTPS, VKScope.DIRECT};
+//        myScope = new String[]{VKScope.VIDEO, VKScope.GROUPS, VKScope.FRIENDS,
+//                VKScope.WALL, VKScope.OFFLINE};
     }
 
     @Override

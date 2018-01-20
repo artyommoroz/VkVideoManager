@@ -2,8 +2,11 @@ package com.frost.vkvideomanager.network;
 
 import com.frost.vkvideomanager.album.Album;
 import com.frost.vkvideomanager.catalog.CatalogSection;
-import com.frost.vkvideomanager.feed.FeedSection;
+import com.frost.vkvideomanager.feed.FeedSectionModel;
 import com.frost.vkvideomanager.wall.WallVideo;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiCommunity;
 import com.vk.sdk.api.model.VKApiPost;
@@ -16,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,8 +152,8 @@ public class Parser {
         return wallVideoList;
     }
 
-    public static List<FeedSection> parseNewsFeed(VKResponse response) {
-        List<FeedSection> feedSectionList = new ArrayList<>();
+    public static List<FeedSectionModel> parseNewsFeed(VKResponse response) {
+        List<FeedSectionModel> feedSectionModelList = new ArrayList<>();
         VKList<VKApiUser> profileList = new VKList<>();
         VKList<VKApiCommunity> communityList = new VKList<>();
 
@@ -175,7 +179,7 @@ public class Parser {
         JSONArray jItems = jResponse.optJSONArray("items");
         for(int i = 0; i < jItems.length(); i++) {
             JSONObject jItem = jItems.optJSONObject(i);
-            FeedSection feedSection = new FeedSection(jItem);
+            FeedSectionModel feedSectionModel = new FeedSectionModel(jItem);
             JSONObject jVideo = jItem.optJSONObject("video");
             JSONArray jVideos = jVideo.optJSONArray("items");
             VKList<VKApiVideo> videoList = new VKList<>();
@@ -187,43 +191,48 @@ public class Parser {
                     e.printStackTrace();
                 }
             }
-            feedSection.setVideoList(videoList);
-            feedSectionList.add(feedSection);
+            feedSectionModel.setVideoList(videoList);
+            feedSectionModelList.add(feedSectionModel);
         }
 
 
-        for (int i = 0; i < feedSectionList.size(); i++) {
-            int sourceId = feedSectionList.get(i).getSourceId();
+        for (int i = 0; i < feedSectionModelList.size(); i++) {
+            int sourceId = feedSectionModelList.get(i).getSourceId();
             if (sourceId < 0) {
                 for (int j = 0; j < communityList.size(); j++) {
                     if (sourceId == -1 * communityList.get(j).id) {
-                        feedSectionList.get(i).setIcon(communityList.get(j).photo_100);
-                        feedSectionList.get(i).setName(communityList.get(j).name);
+                        feedSectionModelList.get(i).setIcon(communityList.get(j).photo_100);
+                        feedSectionModelList.get(i).setName(communityList.get(j).name);
                     }
                 }
             } else {
                 for (int j = 0; j < profileList.size(); j++) {
                     if (sourceId == profileList.get(j).id) {
-                        feedSectionList.get(i).setIcon(profileList.get(j).photo_100);
-                        feedSectionList.get(i).setName(profileList.get(j).first_name + " " + profileList.get(j).last_name);
+                        feedSectionModelList.get(i).setIcon(profileList.get(j).photo_100);
+                        feedSectionModelList.get(i).setName(profileList.get(j).first_name + " " + profileList.get(j).last_name);
                     }
                 }
             }
         }
-        return feedSectionList;
+        return feedSectionModelList;
     }
 
     public static List<CatalogSection> parseCatalog(VKResponse response) {
         List<CatalogSection> catalogSectionList = new ArrayList<>();
-        VKList<VKApiCommunity> communityList = new VKList<>();
+//        VKList<VKApiCommunity> communityVkList = new VKList<>();
+        List<VKApiCommunity> communityList = new ArrayList<>();
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        Type communityListType = new TypeToken<ArrayList<VKApiCommunity>>(){}.getType();
 
         JSONObject jResponse = response.json.optJSONObject("response");
-        JSONArray jCommunties = jResponse.optJSONArray("groups");
-        for (int i = 0; i < jCommunties.length(); i++) {
-            JSONObject jCommunity =  jCommunties.optJSONObject(i);
-            VKApiCommunity community = new VKApiCommunity(jCommunity);
-            communityList.add(community);
-        }
+//        JSONArray jCommunties = jResponse.optJSONArray("groups");
+//        String communitiesString = jCommunties.toString();
+        communityList = gson.fromJson(jResponse.optJSONArray("groups").toString(), communityListType);
+//        for (int i = 0; i < jCommunties.length(); i++) {
+//            JSONObject jCommunity =  jCommunties.optJSONObject(i);
+//            VKApiCommunity community = new VKApiCommunity(jCommunity);
+//            communityVkList.add(community);
+//        }
 
         JSONArray jSections = jResponse.optJSONArray("items");
         for (int i = 0; i < jSections.length(); i++) {

@@ -9,8 +9,8 @@ import android.support.v7.widget.Toolbar;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.ViewPagerAdapter;
-import com.frost.vkvideomanager.video.VideosFragment;
-import com.frost.vkvideomanager.wall.WallFragment;
+import com.frost.vkvideomanager.mosby.VideosFragmentMosby;
+import com.frost.vkvideomanager.mosby.WallVideosFragmentMosby;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,10 @@ public class CommunityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_friend);
         ButterKnife.bind(this);
 
+//        AdView adView = (AdView) findViewById(R.id.adView);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        adView.loadAd(adRequest);
+
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -48,8 +52,8 @@ public class CommunityActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(name);
 
         int communityId = getIntent().getIntExtra(COMMUNITY_ID, 1);
-        fragments.add(VideosFragment.newInstance(communityId, 0, false));
-        fragments.add(WallFragment.newInstance(communityId));
+        fragments.add(VideosFragmentMosby.newInstance(communityId, 0, false));
+        fragments.add(WallVideosFragmentMosby.newInstance(communityId));
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), this);
         viewPager.setAdapter(viewPagerAdapter);

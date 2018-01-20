@@ -32,9 +32,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         switch (fragments.get(position).getClass().getSimpleName()) {
             case "VideosFragment":
                 return context.getString(R.string.fragment_videos);
-            case "WallFragment":
+//            case "WallFragment":
+            case "WallVideosFragmentMosby":
                 return context.getString(R.string.fragment_wall);
-            case "AlbumsFragment":
+//            case "AlbumsFragment":
+            case "AlbumsFragmentMosby":
                 return context.getString(R.string.fragment_albums);
             default:
                 return context.getString(R.string.fragment_videos);

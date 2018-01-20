@@ -9,6 +9,9 @@ import android.support.v7.widget.Toolbar;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.ViewPagerAdapter;
+import com.frost.vkvideomanager.mosby.AlbumsFragmentMosby;
+import com.frost.vkvideomanager.mosby.VideosFragmentMosby;
+import com.frost.vkvideomanager.mosby.WallVideosFragmentMosby;
 import com.frost.vkvideomanager.video.VideosFragment;
 import com.frost.vkvideomanager.wall.WallFragment;
 
@@ -49,8 +52,8 @@ public class FriendActivity extends AppCompatActivity {
 
         int friendId = getIntent().getIntExtra(FRIEND_ID, 13);
 
-        fragments.add(VideosFragment.newInstance(friendId, 0, false));
-        fragments.add(WallFragment.newInstance(friendId));
+        fragments.add(VideosFragmentMosby.newInstance(friendId, 0, false));
+        fragments.add(WallVideosFragmentMosby.newInstance(friendId));
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), this);
         viewPager.setAdapter(viewPagerAdapter);

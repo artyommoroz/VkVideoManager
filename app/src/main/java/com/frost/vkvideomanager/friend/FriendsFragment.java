@@ -113,6 +113,4 @@ public class FriendsFragment extends BaseFragment implements FriendAdapter.ItemC
         startActivity(friendIntent);
     }
 
-
-
 }

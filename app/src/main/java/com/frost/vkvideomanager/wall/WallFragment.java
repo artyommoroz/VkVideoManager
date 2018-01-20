@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.MainActivity;
 import com.frost.vkvideomanager.network.AdditionRequests;
 import com.frost.vkvideomanager.network.NetworkChecker;
 import com.frost.vkvideomanager.network.Parser;
@@ -28,15 +27,13 @@ import com.vk.sdk.api.model.VKList;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
 
-
-public class WallFragment extends BaseFragment implements WallAdapter.ItemClickListener {
+public class WallFragment extends BaseFragment implements WallVideoAdapter.ItemClickListener {
 
     private static final String OWNER_ID = "ownerId";
 
     private List<WallVideo> wallVideoList = new ArrayList<>();
-    private WallAdapter wallAdapter;
+    private WallVideoAdapter wallVideoAdapter;
     private int offset = 100;
     private int ownerId;
     private boolean noVideos;
@@ -67,7 +64,7 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
         super.onViewCreated(view, savedInstanceState);
 
         if (NetworkChecker.isOnline(getActivity())) {
-            recyclerView.setAdapter(wallAdapter);
+            recyclerView.setAdapter(wallVideoAdapter);
         }
 
         if (noVideos) {
@@ -93,8 +90,8 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
                         super.onComplete(response);
                         List<WallVideo> loadedVideo = Parser.parseWall(response);
                         wallVideoList.addAll(loadedVideo);
-                        int curSize = wallAdapter.getItemCount();
-                        wallAdapter.notifyItemRangeInserted(curSize, wallVideoList.size() - 1);
+                        int curSize = wallVideoAdapter.getItemCount();
+                        wallVideoAdapter.notifyItemRangeInserted(curSize, wallVideoList.size() - 1);
                     }
                 });
                 offset += 100;
@@ -138,8 +135,8 @@ public class WallFragment extends BaseFragment implements WallAdapter.ItemClickL
                 swipeRefresh.setRefreshing(false);
                 wallVideoList.clear();
                 wallVideoList = Parser.parseWall(response);
-                wallAdapter = new WallAdapter(getActivity(), wallVideoList, WallFragment.this);
-                recyclerView.setAdapter(wallAdapter);
+                wallVideoAdapter = new WallVideoAdapter(getActivity(), wallVideoList, WallFragment.this);
+                recyclerView.setAdapter(wallVideoAdapter);
                 if (wallVideoList.isEmpty()) {
                     noVideosView.setText(R.string.no_wall_videos);
                     noVideosView.setVisibility(View.VISIBLE);

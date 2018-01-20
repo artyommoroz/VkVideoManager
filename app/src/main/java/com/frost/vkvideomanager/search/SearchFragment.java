@@ -104,6 +104,7 @@ public class SearchFragment extends BaseFragment implements VideoAdapter.ItemCli
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.onActionViewExpanded();
+        searchView.setQuery(query, false);
         searchView.setMaxWidth(700);
         searchView.setOnQueryTextListener(this);
 

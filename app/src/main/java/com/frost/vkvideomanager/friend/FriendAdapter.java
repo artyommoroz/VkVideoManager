@@ -20,14 +20,27 @@ import butterknife.ButterKnife;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
-    private VKList<VKApiUser> friendList;
+    private VKList<VKApiUser> friends;
     private Context context;
     private ItemClickListener itemClickListener;
 
-    public FriendAdapter(Context context, VKList<VKApiUser> friendList, ItemClickListener itemClickListener) {
+    public FriendAdapter(Context context, VKList<VKApiUser> friends, ItemClickListener itemClickListener) {
         this.context = context;
-        this.friendList = friendList;
+        this.friends = friends;
         this.itemClickListener = itemClickListener;
+    }
+
+    public FriendAdapter(Context context, ItemClickListener itemClickListener) {
+        this.context = context;
+        this.itemClickListener = itemClickListener;
+    }
+
+    public void setFriends(VKList<VKApiUser> friends) {
+        this.friends = friends;
+    }
+
+    public VKList<VKApiUser> getFriends() {
+        return friends;
     }
 
     @Override
@@ -38,7 +51,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public void onBindViewHolder(FriendViewHolder holder, int position) {
-        VKApiUser friend = friendList.get(position);
+        VKApiUser friend = friends.get(position);
         holder.name.setText(String.format("%s %s", friend.first_name, friend.last_name));
         Picasso.with(context).load(friend.photo_100).fit().centerCrop()
                 .transform(new CircleTransform()).into(holder.avatar);
@@ -46,7 +59,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public int getItemCount() {
-        return friendList.size();
+        return friends.size();
     }
 
 

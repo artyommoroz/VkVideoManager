@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.frost.vkvideomanager.R;
 import com.squareup.picasso.Picasso;
+import com.vk.sdk.api.model.VKApiCommunity;
+import com.vk.sdk.api.model.VKList;
 
 import java.util.List;
 
@@ -19,14 +21,27 @@ import butterknife.ButterKnife;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
 
-    private List<Album> albumList;
+    private List<Album> albums;
     private Context context;
     private ItemClickListener itemClickListener;
 
-    public AlbumAdapter(Context context, List<Album> albumList, ItemClickListener itemClickListener) {
+    public AlbumAdapter(Context context, List<Album> albums, ItemClickListener itemClickListener) {
         this.context = context;
-        this.albumList = albumList;
+        this.albums = albums;
         this.itemClickListener = itemClickListener;
+    }
+
+    public AlbumAdapter(Context context, ItemClickListener itemClickListener) {
+        this.context = context;
+        this.itemClickListener = itemClickListener;
+    }
+
+    public List<Album> getAlbums() {
+        return albums;
+    }
+
+    public void setAlbums(List<Album> albums) {
+        this.albums = albums;
     }
 
     @Override
@@ -37,7 +52,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     @Override
     public void onBindViewHolder(AlbumViewHolder holder, int position) {
-        Album album = albumList.get(position);
+        Album album = albums.get(position);
         holder.title.setText(album.getTitle());
         holder.count.setText(context.getString(R.string.album_number_of_videos, album.getCount()));
         if (album.getCount() > 0) {
@@ -50,7 +65,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     @Override
     public int getItemCount() {
-        return albumList.size();
+        return albums.size();
     }
 
     public class AlbumViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -22,16 +22,29 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
-public class WallAdapter extends RecyclerView.Adapter<WallAdapter.WallVideoViewHolder> {
+public class WallVideoAdapter extends RecyclerView.Adapter<WallVideoAdapter.WallVideoViewHolder> {
 
-    private List<WallVideo> wallVideoList = new ArrayList<>();
+    private List<WallVideo> wallVideos = new ArrayList<>();
     private Context context;
     private ItemClickListener itemClickListener;
 
-    public WallAdapter(Context context, List<WallVideo> wallVideoList, ItemClickListener itemClickListener) {
+    public WallVideoAdapter(Context context, List<WallVideo> wallVideos, ItemClickListener itemClickListener) {
         this.context = context;
-        this.wallVideoList = wallVideoList;
+        this.wallVideos = wallVideos;
         this.itemClickListener = itemClickListener;
+    }
+
+    public WallVideoAdapter(Context context, ItemClickListener itemClickListener) {
+        this.context = context;
+        this.itemClickListener = itemClickListener;
+    }
+
+    public List<WallVideo> getWallVideos() {
+        return wallVideos;
+    }
+
+    public void setWallVideos(List<WallVideo> wallVideos) {
+        this.wallVideos = wallVideos;
     }
 
     @Override
@@ -42,7 +55,7 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.WallVideoViewH
 
     @Override
     public void onBindViewHolder(WallVideoViewHolder holder, int position) {
-        WallVideo wallVideo = wallVideoList.get(position);
+        WallVideo wallVideo = wallVideos.get(position);
         holder.name.setText(wallVideo.getName());
         Picasso.with(context).load(wallVideo.getIcon()).fit().centerCrop()
                 .transform(new CircleTransform()).into(holder.icon);
@@ -55,7 +68,7 @@ public class WallAdapter extends RecyclerView.Adapter<WallAdapter.WallVideoViewH
 
     @Override
     public int getItemCount() {
-        return wallVideoList.size();
+        return wallVideos.size();
     }
 
 

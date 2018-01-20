@@ -20,14 +20,27 @@ import butterknife.ButterKnife;
 
 public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.CommunityViewHolder> {
 
-    private VKList<VKApiCommunity> communityList;
+    private VKList<VKApiCommunity> communities;
     private Context context;
     private ItemClickListener itemClickListener;
 
-    public CommunityAdapter(Context context, VKList<VKApiCommunity> communityList, ItemClickListener itemClickListener) {
+    public CommunityAdapter(Context context, VKList<VKApiCommunity> communities, ItemClickListener itemClickListener) {
         this.context = context;
-        this.communityList = communityList;
+        this.communities = communities;
         this.itemClickListener = itemClickListener;
+    }
+
+    public CommunityAdapter(Context context, ItemClickListener itemClickListener) {
+        this.context = context;
+        this.itemClickListener = itemClickListener;
+    }
+
+    public VKList<VKApiCommunity> getCommunities() {
+        return communities;
+    }
+
+    public void setCommunities(VKList<VKApiCommunity> communities) {
+        this.communities = communities;
     }
 
     @Override
@@ -38,14 +51,14 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.Comm
 
     @Override
     public void onBindViewHolder(CommunityViewHolder holder, int position) {
-        holder.name.setText(communityList.get(position).name);
-        Picasso.with(context).load(communityList.get(position).photo_100).fit().centerCrop()
+        holder.name.setText(communities.get(position).name);
+        Picasso.with(context).load(communities.get(position).photo_100).fit().centerCrop()
                 .transform(new CircleTransform()).into(holder.icon);
     }
 
     @Override
     public int getItemCount() {
-        return communityList.size();
+        return communities.size();
     }
 
     public class CommunityViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

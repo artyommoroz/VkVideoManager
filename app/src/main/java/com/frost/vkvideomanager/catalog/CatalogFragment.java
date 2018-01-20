@@ -110,7 +110,7 @@ public class CatalogFragment extends BaseFragment {
         final VKRequest catalogRequest = new VKRequest(CATALOG_REQUEST, VKParameters.from(
                 VKApiConst.COUNT, 16,
                 VKApiConst.EXTENDED, 1,
-                VKApiConst.FILTERS, "other, ugc"));
+                VKApiConst.FILTERS, "other"));
         catalogRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onError(VKError error) {

@@ -38,10 +38,18 @@
     <group
         android:id="@+id/group2"
         android:checkableBehavior="single">
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_exit_to_app_white_24dp"
-                android:title="@string/drawer_item_logout" />
+        <!--<item-->
+            <!--android:id="@+id/nav_remove_ads"-->
+            <!--android:icon="@drawable/ic_thumb_up_white_24px"-->
+            <!--android:title="@string/drawer_item_rate_app" />-->
+        <item
+            android:id="@+id/nav_rate_app"
+            android:icon="@drawable/ic_thumb_up_white_24px"
+            android:title="@string/drawer_item_rate_app" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_exit_to_app_white_24dp"
+            android:title="@string/drawer_item_logout" />
     </group>
 
 </menu>

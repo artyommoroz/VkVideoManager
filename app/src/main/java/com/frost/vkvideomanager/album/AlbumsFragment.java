@@ -200,7 +200,7 @@ public class AlbumsFragment extends BaseFragment implements AlbumAdapter.ItemCli
     }
 
     @Override
-    public void onDialogPositiveClick(final String title, final String privacy, final int position) {
+    public void onPositiveClick(final int position, final String title, final String privacy) {
         if (!albumList.get(position).getTitle().equals(title)
                 || !albumList.get(position).getPrivacy().equals(privacy)) {
             int privacyNumber = 0;

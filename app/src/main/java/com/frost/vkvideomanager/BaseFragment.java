@@ -26,15 +26,15 @@ public class BaseFragment extends Fragment {
     protected RelativeLayout rootView;
     @Bind(R.id.recyclerView)
     protected RecyclerView recyclerView;
-    @Bind(R.id.progressBar)
+    @Bind(R.id.loadingView)
     protected ProgressBar progressBar;
-    @Bind(R.id.swipeRefresh)
+    @Bind(R.id.contentView)
     protected SwipeRefreshLayout swipeRefresh;
     @Bind(R.id.noConnectionView)
     protected RelativeLayout noConnectionView;
     @Bind(R.id.retryButton)
     protected Button retryButton;
-    @Bind(R.id.noVideosView)
+    @Bind(R.id.noneItemsView)
     protected TextView noVideosView;
 
     public BaseFragment() {}

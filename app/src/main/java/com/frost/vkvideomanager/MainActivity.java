@@ -2,6 +2,7 @@ package com.frost.vkvideomanager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -18,14 +19,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.frost.vkvideomanager.catalog.CatalogFragment;
-import com.frost.vkvideomanager.community.CommunitiesFragment;
-import com.frost.vkvideomanager.feed.FeedFragment;
-import com.frost.vkvideomanager.friend.FriendsFragment;
-import com.frost.vkvideomanager.search.SearchFragment;
+import com.frost.vkvideomanager.mosby.CatalogFragmentMosby;
+import com.frost.vkvideomanager.mosby.CommunitiesFragmentMosby;
+import com.frost.vkvideomanager.mosby.FavoritesFragmentMosby;
+import com.frost.vkvideomanager.mosby.FeedFragmentMosby;
+import com.frost.vkvideomanager.mosby.FriendsFragmentMosby;
+import com.frost.vkvideomanager.mosby.SearchFragmentMosby;
 import com.frost.vkvideomanager.utils.CircleTransform;
-import com.frost.vkvideomanager.video.FavoritesFragment;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.picasso.Picasso;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKApi;
@@ -39,7 +39,9 @@ import com.vk.sdk.api.model.VKList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener {
+//        , BillingProcessor.IBillingHandler {
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
     @Bind(R.id.tabLayout)
     TabLayout tabLayout;
+//    @Bind(R.id.adView)
+//    AdView adView;
 
     private static final String TAG_CONTAINER = "container";
     private static final String TAG_FEED = "feed";
@@ -58,11 +62,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG_FAVORITES = "favorites";
     private static final String TAG_SEARCH = "search";
     private static final String TITLE = "title";
+    private static final String GOOGLE_PLAY_URL = "market://details?id=com.frost.vkvideomanager";
+    private static final String GOOGLE_API_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA21g4MlBZOOCGvUtrekmXfjpHpMb00CzXKCqbz6RX5P9xarjTtUXUrrHWa3oOEW/JN05AimYCynxCVSUTXtvHVfvJ/V4GR88SNj0v2sqHgmpo5NE9LsUbZhl01Bq9BnqBtv/7IlVaKBcTUrgvUKvSjzwpWNHkg4njWQUdCSyLmh2TnqOJIKY3MeVrgfRQ4O2mUoYARay941zaiNP0obJYq0yp/3GEZnL9Kl7B6FPCGr9DFq3vqBVOd89UICgaVkDE3/l452nK/9CjsjZbRnv9nXPpLzOmCKoaE+GjwdWZkBD0jb8puj4yckyaKULWh2PBY2zuyLQO2nggMk/CrMc1kwIDAQAB";
+    private static final String GOOGLE_PRODUCT_ID = "remove_ads";
+    private static final String GOOGLE_MERCHANT_ID = "3689-0974-6364";
 
     private VKApiUser vkApiUser;
     private Bundle state;
+//    private BillingProcessor billingProcessor;
     private CharSequence title;
-    private FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +79,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+//        billingProcessor = new BillingProcessor(this, GOOGLE_API_KEY, GOOGLE_MERCHANT_ID, this);
+
+//        FirebaseAnalytics.getInstance(this);
+//        MobileAds.initialize(getApplicationContext(), "ca-app-pub-7469946279231621~5606710797");
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        adView.loadAd(adRequest);
 
         View header = navigationView.getHeaderView(0);
         final ImageView headerImage = (ImageView) header.findViewById(R.id.icon);
@@ -100,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .transform(new CircleTransform()).into(headerImage);
             }
         });
-
     }
 
     @Override
@@ -108,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         outState.putCharSequence(TITLE, title);
         super.onSaveInstanceState(outState);
     }
+
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -128,9 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        item.setChecked(true);
         tabLayout.setVisibility(View.GONE);
-
         String tag = null;
         Fragment fragment = null;
 
@@ -143,34 +154,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_news:
                 title = item.getTitle();
                 tag = TAG_FEED;
-                fragment = FeedFragment.newInstance();
+                fragment = FeedFragmentMosby.newInstance();
+//                fragment = FeedFragment.newInstance();
                 break;
             case R.id.nav_catalog:
                 title = item.getTitle();
                 tag = TAG_CATALOG;
-                fragment = CatalogFragment.newInstance();
+//                fragment = CatalogFragment.newInstance();
+                fragment = CatalogFragmentMosby.newInstance();
                 break;
             case R.id.nav_friends:
                 title = item.getTitle();
                 tag = TAG_FRIENDS;
-                fragment = FriendsFragment.newInstance();
+//                fragment = FriendsFragment.newInstance();
+                fragment = FriendsFragmentMosby.newInstance();
                 break;
             case R.id.nav_communities:
                 title = item.getTitle();
                 tag = TAG_COMMUNITIES;
-                fragment = CommunitiesFragment.newInstance();
-                break;
-            case R.id.nav_search:
-                title = item.getTitle();
-                tag = TAG_SEARCH;
-                fragment = SearchFragment.newInstance();
+//                fragment = CommunitiesFragment.newInstance();
+                fragment = CommunitiesFragmentMosby.newInstance();
                 break;
             case R.id.nav_favorites:
                 title = item.getTitle();
                 tag = TAG_FAVORITES;
-                fragment = FavoritesFragment.newInstance();
+//                fragment = FavoritesFragment.newInstance();
+                fragment = FavoritesFragmentMosby.newInstance();
+                break;
+            case R.id.nav_search:
+                title = item.getTitle();
+                tag = TAG_SEARCH;
+//                fragment = SearchFragment.newInstance();
+                fragment = SearchFragmentMosby.newInstance();
+                break;
+//            case R.id.nav_remove_ads:
+//                billingProcessor.purchase(this, GOOGLE_PRODUCT_ID);
+//                removeAds();
+//                break;
+            case R.id.nav_rate_app:
+                item.setCheckable(false);
+                fragment = null;
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_URL)));
                 break;
             case R.id.nav_logout:
+                item.setCheckable(false);
                 fragment = null;
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(R.string.logout_message)
@@ -202,4 +229,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+//    private void removeAds() {
+//        adView.setVisibility(View.GONE);
+//        navigationView.getMenu().findItem(R.id.nav_remove_ads).setVisible(false);
+//    }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
+//            super.onActivityResult(requestCode, resultCode, data);
+//        }
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//       if (billingProcessor != null) {
+//           billingProcessor.release();
+//       }
+//        super.onDestroy();
+//    }
+
+//    @Override
+//    public void onProductPurchased(String productId, TransactionDetails details) {
+//        Toast.makeText(this, "SUCCESS " + productId, Toast.LENGTH_SHORT).show();
+//    }z
+//
+//    @Override
+//    public void onPurchaseHistoryRestored() {
+//
+//    }
+//
+//    @Override
+//    public void onBillingError(int errorCode, Throwable error) {
+//        Toast.makeText(this, "CANCELED " + errorCode, Toast.LENGTH_SHORT).show();
+//    }
+//
+//    @Override
+//    public void onBillingInitialized() {
+//        Toast.makeText(this, "INITIALIZED", Toast.LENGTH_SHORT).show();
+//    }
 }

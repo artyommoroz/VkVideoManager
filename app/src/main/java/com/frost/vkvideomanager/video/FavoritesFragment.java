@@ -9,6 +9,7 @@ import android.support.v7.widget.PopupMenu;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.frost.vkvideomanager.BaseFragment;
 import com.frost.vkvideomanager.R;
@@ -24,6 +25,9 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import butterknife.ButterKnife;
 
@@ -120,7 +124,7 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
 
     private void updateVideoList() {
         VKRequest videoRequest;
-        videoRequest = new VKRequest(FAVORITES_REQUEST, VKParameters.from(VKApiConst.EXTENDED, 1));
+        videoRequest = new VKRequest(FAVORITES_REQUEST, VKParameters.from(VKApiConst.EXTENDED, 1), VKApiVideo.class);
         videoRequest.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onError(VKError error) {
@@ -162,6 +166,7 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
         if (v instanceof RelativeLayout) {
             String videoUri = videoList.get(position).player;
             UrlHelper.playVideo(getActivity(), videoUri);
+//            getLinks(videoList.get(position));
         } else if (v instanceof ImageButton){
             PopupMenu popupMenu = new PopupMenu(getActivity(), v);
             popupMenu.inflate(R.menu.popup_menu_video);
@@ -179,6 +184,32 @@ public class FavoritesFragment extends BaseFragment implements VideoAdapter.Item
             });
             popupMenu.show();
         }
+    }
+
+    private void getLinks(VKApiVideo vkApiVideo) {
+        VKRequest vkRequest = new VKRequest("video.get", VKParameters.from(VKApiConst.OWNER_ID,
+                Integer.valueOf(vkApiVideo.owner_id), "videos",
+                vkApiVideo.owner_id + "_" + vkApiVideo.id + "_" +vkApiVideo.access_key));
+        vkRequest.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                JSONObject video;
+                try {
+                    video = response.json.getJSONObject("response").getJSONArray("items").getJSONObject(0);
+                    Toast.makeText(getActivity(), video.getString("title"), Toast.LENGTH_SHORT).show();
+                    JSONObject files = video.getJSONObject("files");
+                    Toast.makeText(getActivity(), files.getString("mp4_240"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), files.getString("mp4_360"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                VKList vkList = new VKList(response.json, VKApiVideo.class);
+//                VKApiVideo apiVideo = (VKApiVideo) vkList.get(0);
+//                Toast.makeText(getActivity(), apiVideo.mp4_240, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), apiVideo.mp4_360, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.album.AlbumsFragment;
+import com.frost.vkvideomanager.mosby.AlbumsFragmentMosby;
+import com.frost.vkvideomanager.mosby.VideosFragmentMosby;
+import com.frost.vkvideomanager.mosby.WallVideosFragmentMosby;
 import com.frost.vkvideomanager.video.FavoritesFragment;
 import com.frost.vkvideomanager.video.VideosFragment;
 import com.frost.vkvideomanager.wall.WallFragment;
@@ -47,9 +50,12 @@ public class ContainerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        fragments.add(VideosFragment.newInstance(0, 0, true));
-        fragments.add(AlbumsFragment.newInstance());
-        fragments.add(WallFragment.newInstance(0));
+        fragments.add(VideosFragmentMosby.newInstance(0, 0, true));
+//        fragments.add(VideosFragment.newInstance(0, 0, true));
+        fragments.add(AlbumsFragmentMosby.newInstance());
+//        fragments.add(AlbumsFragment.newInstance());
+        fragments.add(WallVideosFragmentMosby.newInstance(0));
+//        fragments.add(WallFragment.newInstance(0));
     }
 
     @Override
