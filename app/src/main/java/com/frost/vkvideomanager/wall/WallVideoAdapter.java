@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -27,12 +27,6 @@ public class WallVideoAdapter extends RecyclerView.Adapter<WallVideoAdapter.Wall
     private List<WallVideo> wallVideos = new ArrayList<>();
     private Context context;
     private ItemClickListener itemClickListener;
-
-    public WallVideoAdapter(Context context, List<WallVideo> wallVideos, ItemClickListener itemClickListener) {
-        this.context = context;
-        this.wallVideos = wallVideos;
-        this.itemClickListener = itemClickListener;
-    }
 
     public WallVideoAdapter(Context context, ItemClickListener itemClickListener) {
         this.context = context;
@@ -74,21 +68,21 @@ public class WallVideoAdapter extends RecyclerView.Adapter<WallVideoAdapter.Wall
 
     public class WallVideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
-        @Bind(R.id.date)
+        @BindView(R.id.date)
         TextView date;
-        @Bind(R.id.imageVideo)
+        @BindView(R.id.imageVideo)
         ImageView imageVideo;
-        @Bind(R.id.icon)
+        @BindView(R.id.icon)
         ImageView icon;
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
-        @Bind(R.id.duration)
+        @BindView(R.id.duration)
         TextView duration;
-        @Bind(R.id.moreButton)
+        @BindView(R.id.moreButton)
         ImageButton moreButton;
-        @Bind(R.id.rootView)
+        @BindView(R.id.rootView)
         CardView rootView;
 
         public WallVideoViewHolder(View itemView) {

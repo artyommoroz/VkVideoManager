@@ -16,7 +16,7 @@ import com.vk.sdk.api.model.VKList;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder> {
@@ -24,12 +24,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
     private List<Album> albums;
     private Context context;
     private ItemClickListener itemClickListener;
-
-    public AlbumAdapter(Context context, List<Album> albums, ItemClickListener itemClickListener) {
-        this.context = context;
-        this.albums = albums;
-        this.itemClickListener = itemClickListener;
-    }
 
     public AlbumAdapter(Context context, ItemClickListener itemClickListener) {
         this.context = context;
@@ -70,15 +64,15 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumViewHol
 
     public class AlbumViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.count)
+        @BindView(R.id.count)
         TextView count;
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
-        @Bind(R.id.imageAlbum)
+        @BindView(R.id.imageAlbum)
         ImageView image;
-        @Bind(R.id.privacy)
+        @BindView(R.id.privacy)
         ImageView privacy;
-        @Bind(R.id.moreButton)
+        @BindView(R.id.moreButton)
         ImageButton moreButton;
 
         public AlbumViewHolder(View itemView) {

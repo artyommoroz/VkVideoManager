@@ -26,7 +26,7 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
@@ -129,15 +129,15 @@ public class FeedSection extends StatelessSection {
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.rootView)
+        @BindView(R.id.rootView)
         LinearLayout rootView;
-        @Bind(R.id.duration)
+        @BindView(R.id.duration)
         TextView duration;
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
-        @Bind(R.id.imageVideo)
+        @BindView(R.id.imageVideo)
         ImageView imageVideo;
-        @Bind(R.id.moreButton)
+        @BindView(R.id.moreButton)
         ImageButton moreButton;
 
         public ItemViewHolder(View itemView) {
@@ -148,11 +148,11 @@ public class FeedSection extends StatelessSection {
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.icon)
+        @BindView(R.id.icon)
         ImageView icon;
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
-        @Bind(R.id.date)
+        @BindView(R.id.date)
         TextView date;
 
         public HeaderViewHolder(View itemView) {

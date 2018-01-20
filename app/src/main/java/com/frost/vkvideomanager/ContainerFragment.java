@@ -1,36 +1,28 @@
 package com.frost.vkvideomanager;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentHostCallback;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.frost.vkvideomanager.album.AlbumsFragment;
-import com.frost.vkvideomanager.mosby.AlbumsFragmentMosby;
-import com.frost.vkvideomanager.mosby.VideosFragmentMosby;
-import com.frost.vkvideomanager.mosby.WallVideosFragmentMosby;
-import com.frost.vkvideomanager.video.FavoritesFragment;
 import com.frost.vkvideomanager.video.VideosFragment;
-import com.frost.vkvideomanager.wall.WallFragment;
+import com.frost.vkvideomanager.wall.WallVideosFragment;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
 public class ContainerFragment extends Fragment {
 
-    @Bind(R.id.viewPager)
+    @BindView(R.id.viewPager)
     ViewPager viewPager;
 
     private ViewPagerAdapter viewPagerAdapter;
@@ -50,12 +42,9 @@ public class ContainerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        fragments.add(VideosFragmentMosby.newInstance(0, 0, true));
-//        fragments.add(VideosFragment.newInstance(0, 0, true));
-        fragments.add(AlbumsFragmentMosby.newInstance());
-//        fragments.add(AlbumsFragment.newInstance());
-        fragments.add(WallVideosFragmentMosby.newInstance(0));
-//        fragments.add(WallFragment.newInstance(0));
+        fragments.add(VideosFragment.newInstance(0, 0, true));
+        fragments.add(AlbumsFragment.newInstance());
+        fragments.add(WallVideosFragment.newInstance(0));
     }
 
     @Override

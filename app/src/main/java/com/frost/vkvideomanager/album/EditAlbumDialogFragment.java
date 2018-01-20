@@ -114,7 +114,6 @@ public class EditAlbumDialogFragment extends DialogFragment {
     }
 
     public interface EditDialogListener {
-//        void onPositiveClick(final String title, final String privacy, final int position);
         void onPositiveClick(final int position, final String title, final String privacy);
     }
 }

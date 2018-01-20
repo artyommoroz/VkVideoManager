@@ -1,51 +1,40 @@
 package com.frost.vkvideomanager.catalog;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.network.NetworkChecker;
-import com.frost.vkvideomanager.network.Parser;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
-import com.frost.vkvideomanager.BaseFragment;
-import com.vk.sdk.api.VKApiConst;
-import com.vk.sdk.api.VKError;
-import com.vk.sdk.api.VKParameters;
-import com.vk.sdk.api.VKRequest;
-import com.vk.sdk.api.VKResponse;
+import com.hannesdorfmann.mosby.mvp.viewstate.lce.LceViewState;
+import com.hannesdorfmann.mosby.mvp.viewstate.lce.MvpLceViewStateFragment;
+import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
-import org.json.JSONException;
-
-import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 
-public class CatalogFragment extends BaseFragment {
+public class CatalogFragment extends MvpLceViewStateFragment<SwipeRefreshLayout, List<CatalogSection>, CatalogView, CatalogPresenter>
+        implements CatalogView, SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String CATALOG_REQUEST = "video.getCatalog";
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.noneItemsView)
+    TextView noneItemsView;
 
-    private SectionedRecyclerViewAdapter sectionAdapter;
-    private List<CatalogSection> catalogSectionList = new ArrayList<>();
-    private String next;
-
-    public CatalogFragment() {}
+    private SectionedRecyclerViewAdapter adapter;
 
     public static CatalogFragment newInstance() {
         return new CatalogFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        updateCatalog();
     }
 
     @Override
@@ -57,97 +46,96 @@ public class CatalogFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
 
-        if (NetworkChecker.isOnline(getActivity())) {
-            recyclerView.setAdapter(sectionAdapter);
-        }
-
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        errorView.setCompoundDrawablesWithIntrinsicBounds(null,
+                getResources().getDrawable(R.drawable.ic_cloud_off_black_96dp), null, null);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new EndlessScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                VKRequest catalogRequest = new VKRequest(CATALOG_REQUEST, VKParameters.from(
-                        VKApiConst.COUNT, 16,
-                        VKApiConst.CATALOG_FROM, next,
-                        VKApiConst.EXTENDED, 1,
-                        VKApiConst.FILTERS, "other"));
-                catalogRequest.executeWithListener(new VKRequest.VKRequestListener() {
-                    @Override
-                    public void onComplete(VKResponse response) {
-                        super.onComplete(response);
-
-                        List<CatalogSection> loadedCatalogSectionList = Parser.parseCatalog(response);
-                        for (int i = 0; i < loadedCatalogSectionList.size(); i++) {
-                            CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(),
-                                    loadedCatalogSectionList.get(i));
-                            sectionAdapter.addSection(catalogSectionAdapter);
-                        }
-                        try {
-                            next = response.json.optJSONObject("response").getString("next");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        catalogSectionList.addAll(loadedCatalogSectionList);
-                        if (catalogSectionList.size() <= 135) {
-                            int curSize = sectionAdapter.getItemCount();
-                            sectionAdapter.notifyItemRangeInserted(curSize, catalogSectionList.size() - 1);
-                        }
-                    }
-                });
+                presenter.loadMoreCatalogSections();
             }
         });
 
-        swipeRefresh.setOnRefreshListener(() -> updateCatalog());
-
-        retryButton.setOnClickListener(v -> {
-            progressBar.setVisibility(View.VISIBLE);
-            updateCatalog();
-        });
+        contentView.setOnRefreshListener(this);
     }
 
-    private void updateCatalog() {
-        final VKRequest catalogRequest = new VKRequest(CATALOG_REQUEST, VKParameters.from(
-                VKApiConst.COUNT, 16,
-                VKApiConst.EXTENDED, 1,
-                VKApiConst.FILTERS, "other"));
-        catalogRequest.executeWithListener(new VKRequest.VKRequestListener() {
-            @Override
-            public void onError(VKError error) {
-                super.onError(error);
-                swipeRefresh.setRefreshing(false);
-                progressBar.setVisibility(View.GONE);
-                if (catalogSectionList.isEmpty()) {
-                    noConnectionView.setVisibility(View.VISIBLE);
-                } else if (catalogSectionList.size() > 0){
-                    Snackbar.make(rootView, getString(R.string.no_connection_snack_message), Snackbar.LENGTH_LONG)
-                            .setAction(R.string.no_connection_snack_button, view -> {
-                                updateCatalog();
-                            }).show();
-                }
-            }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        adapter = null;
 
-            @Override
-            public void onComplete(VKResponse response) {
-                super.onComplete(response);
-                noConnectionView.setVisibility(View.GONE);
-                progressBar.setVisibility(View.INVISIBLE);
-                swipeRefresh.setRefreshing(false);
-                catalogSectionList.clear();
-                try {
-                    next = response.json.optJSONObject("response").getString("next");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                catalogSectionList = Parser.parseCatalog(response);
-                sectionAdapter = new SectionedRecyclerViewAdapter();
-                for (int i = 0; i < catalogSectionList.size(); i++) {
-                    CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(),
-                            catalogSectionList.get(i));
-                    sectionAdapter.addSection(catalogSectionAdapter);
-                }
-                recyclerView.setAdapter(sectionAdapter);
-            }
-        });
     }
+
+    @Override
+    public CatalogPresenter createPresenter() {
+        return new CatalogPresenter();
+    }
+
+    @Override
+    public void setData(List<CatalogSection> data) {
+        adapter = new SectionedRecyclerViewAdapter();
+        for (int i = 0; i < data.size(); i++) {
+            CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(), data.get(i));
+            adapter.addSection(catalogSectionAdapter);
+        }
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public List<CatalogSection> getData() {
+        return presenter.getCatalogSections();
+    }
+
+    @Override
+    public void loadData(boolean pullToRefresh) {
+        presenter.loadFeedSections(pullToRefresh);
+    }
+
+
+    @Override
+    public void moreCatalogSectionsLoaded(List<CatalogSection> catalogSections, int oldSize) {
+        for (int i = 0; i < catalogSections.size(); i++) {
+            CatalogSectionAdapter catalogSectionAdapter = new CatalogSectionAdapter(getActivity(), catalogSections.get(i));
+            adapter.addSection(catalogSectionAdapter);
+        }
+        int curSize = adapter.getItemCount();
+        adapter.notifyItemRangeInserted(curSize, oldSize - 1);
+    }
+
+    @Override
+    public LceViewState<List<CatalogSection>, CatalogView> createViewState() {
+        setRetainInstance(true);
+        return new RetainingLceViewState<>();
+    }
+
+    @Override
+    public void showContent() {
+        super.showContent();
+        contentView.setRefreshing(false);
+    }
+
+    @Override
+    public void showLoading(boolean pullToRefresh) {
+        super.showLoading(pullToRefresh);
+        contentView.setRefreshing(pullToRefresh);
+    }
+
+    @Override
+    protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
+        return getString(R.string.no_connection_message);
+    }
+
+    @Override
+    public void onRefresh() {
+        loadData(true);
+    }
+
+
+
 }
+
+

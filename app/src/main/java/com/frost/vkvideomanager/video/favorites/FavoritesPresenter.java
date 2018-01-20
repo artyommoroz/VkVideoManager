@@ -1,9 +1,7 @@
-package com.frost.vkvideomanager.mosby.presenter;
+package com.frost.vkvideomanager.video.favorites;
 
-import com.frost.vkvideomanager.mosby.view.SearchViewMosby;
 import com.frost.vkvideomanager.network.Parser;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
-import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -13,23 +11,18 @@ import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
 
-public class SearchPresenter extends MvpBasePresenter<SearchViewMosby> {
+public class FavoritesPresenter extends MvpBasePresenter<FavoritesView> {
+
+    private static final String FAVORITES_REQUEST = "fave.getVideos";
 
     private int offset;
     private VKList<VKApiVideo> videos = new VKList<>();
 
-    public void loadVideos(final boolean pullToRefresh, final String query, int hd, int adult, int sort, String duration) {
+    public void loadVideos(final boolean pullToRefresh) {
         getView().showLoading(pullToRefresh);
         offset = 50;
-        VKRequest searchRequest = VKApi.video().search(VKParameters.from(
-                VKApiConst.Q, query,
-                VKApiConst.HD, hd,
-                VKApiConst.ADULT, adult,
-                VKApiConst.SORT, sort,
-                VKApiConst.FILTERS, duration,
-                VKApiConst.COUNT, 50
-        ));
-        searchRequest.executeWithListener(new VKRequest.VKRequestListener() {
+        VKRequest request = new VKRequest(FAVORITES_REQUEST, VKParameters.from(VKApiConst.COUNT, 50));
+        request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onError(VKError error) {
                 super.onError(error);
@@ -49,16 +42,12 @@ public class SearchPresenter extends MvpBasePresenter<SearchViewMosby> {
         });
     }
 
-    public void loadMoreVideos(final String query, int hd, int adult, int sort, String duration) {
-        VKRequest request = VKApi.video().search(VKParameters.from(
-                VKApiConst.Q, query,
-                VKApiConst.HD, hd,
-                VKApiConst.ADULT, adult,
-                VKApiConst.SORT, sort,
-                VKApiConst.FILTERS, duration,
-                VKApiConst.COUNT, 50,
-                VKApiConst.OFFSET, offset
-        ));
+    public void loadMoreVideos() {
+        VKRequest request = new VKRequest(FAVORITES_REQUEST, VKParameters.from(
+                VKApiConst.OFFSET, offset,
+                VKApiConst.COUNT, 50),
+                VKApiVideo.class
+        );
         offset += offset;
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override

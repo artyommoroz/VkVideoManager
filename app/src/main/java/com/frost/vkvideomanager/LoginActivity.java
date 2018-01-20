@@ -15,14 +15,14 @@ import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class LoginActivity extends AppCompatActivity {
 
-    @Bind(R.id.loginButton)
+    @BindView(R.id.loginButton)
     Button loginButton;
-    @Bind(R.id.videocamView)
+    @BindView(R.id.videocamView)
     ImageView videocamView;
 
     private static final String[] myScope;

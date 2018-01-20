@@ -8,12 +8,12 @@ import android.support.v7.widget.Toolbar;
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.video.VideosFragment;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AlbumActivity extends AppCompatActivity {
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     public static final String ALBUM_ID = "albumId";
@@ -26,10 +26,6 @@ public class AlbumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         ButterKnife.bind(this);
-
-//        AdView adView = (AdView) findViewById(R.id.adView);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        adView.loadAd(adRequest);
 
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {

@@ -18,7 +18,7 @@ import com.vk.sdk.api.model.VKList;
 
 import java.util.Locale;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -76,15 +76,15 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
 
     public class VideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.duration)
+        @BindView(R.id.duration)
         TextView duration;
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
-        @Bind(R.id.views)
+        @BindView(R.id.views)
         TextView views;
-        @Bind(R.id.imageVideo)
+        @BindView(R.id.imageVideo)
         ImageView imageVideo;
-        @Bind(R.id.moreButton)
+        @BindView(R.id.moreButton)
         ImageButton moreButton;
 
         public VideoViewHolder(View itemView) {

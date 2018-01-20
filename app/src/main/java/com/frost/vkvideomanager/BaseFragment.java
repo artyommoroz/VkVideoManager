@@ -17,24 +17,24 @@ import android.widget.TextView;
 
 import com.frost.vkvideomanager.network.NetworkChecker;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class BaseFragment extends Fragment {
 
-    @Bind(R.id.rootView)
+    @BindView(R.id.rootView)
     protected RelativeLayout rootView;
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     protected RecyclerView recyclerView;
-    @Bind(R.id.loadingView)
+    @BindView(R.id.loadingView)
     protected ProgressBar progressBar;
-    @Bind(R.id.contentView)
+    @BindView(R.id.contentView)
     protected SwipeRefreshLayout swipeRefresh;
-    @Bind(R.id.noConnectionView)
+    @BindView(R.id.noConnectionView)
     protected RelativeLayout noConnectionView;
-    @Bind(R.id.retryButton)
+    @BindView(R.id.retryButton)
     protected Button retryButton;
-    @Bind(R.id.noneItemsView)
+    @BindView(R.id.noneItemsView)
     protected TextView noVideosView;
 
     public BaseFragment() {}

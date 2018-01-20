@@ -1,4 +1,4 @@
-package com.frost.vkvideomanager.mosby.view;
+package com.frost.vkvideomanager.friend;
 
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 import com.vk.sdk.api.model.VKApiUser;

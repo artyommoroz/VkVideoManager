@@ -9,25 +9,22 @@ import android.support.v7.widget.Toolbar;
 
 import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.ViewPagerAdapter;
-import com.frost.vkvideomanager.mosby.AlbumsFragmentMosby;
-import com.frost.vkvideomanager.mosby.VideosFragmentMosby;
-import com.frost.vkvideomanager.mosby.WallVideosFragmentMosby;
 import com.frost.vkvideomanager.video.VideosFragment;
-import com.frost.vkvideomanager.wall.WallFragment;
+import com.frost.vkvideomanager.wall.WallVideosFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class FriendActivity extends AppCompatActivity {
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @Bind(R.id.viewPager)
+    @BindView(R.id.viewPager)
     ViewPager viewPager;
-    @Bind(R.id.tabLayout)
+    @BindView(R.id.tabLayout)
     TabLayout tabLayout;
 
     public static final String FRIEND_ID = "friendId";
@@ -52,8 +49,8 @@ public class FriendActivity extends AppCompatActivity {
 
         int friendId = getIntent().getIntExtra(FRIEND_ID, 13);
 
-        fragments.add(VideosFragmentMosby.newInstance(friendId, 0, false));
-        fragments.add(WallVideosFragmentMosby.newInstance(friendId));
+        fragments.add(VideosFragment.newInstance(friendId, 0, false));
+        fragments.add(WallVideosFragment.newInstance(friendId));
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), this);
         viewPager.setAdapter(viewPagerAdapter);

@@ -1,10 +1,5 @@
-package com.frost.vkvideomanager.mosby.presenter;
+package com.frost.vkvideomanager.album;
 
-import android.widget.Toast;
-
-import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.album.Album;
-import com.frost.vkvideomanager.mosby.view.AlbumsView;
 import com.frost.vkvideomanager.network.Parser;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.vk.sdk.api.VKApi;
@@ -13,14 +8,9 @@ import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiUser;
-import com.vk.sdk.api.model.VKList;
 
 import java.util.List;
 
-/**
- * Created by frost on 15.10.16.
- */
 
 public class AlbumsPresenter extends MvpBasePresenter<AlbumsView> {
 

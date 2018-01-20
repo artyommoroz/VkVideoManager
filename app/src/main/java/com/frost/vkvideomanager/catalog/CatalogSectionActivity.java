@@ -8,12 +8,12 @@ import android.view.View;
 
 import com.frost.vkvideomanager.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class CatalogSectionActivity extends AppCompatActivity {
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     public static final String SECTION_TITLE = "sectionTitle";

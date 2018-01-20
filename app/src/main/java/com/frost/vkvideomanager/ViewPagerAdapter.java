@@ -5,8 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.frost.vkvideomanager.wall.WallFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +30,9 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         switch (fragments.get(position).getClass().getSimpleName()) {
             case "VideosFragment":
                 return context.getString(R.string.fragment_videos);
-//            case "WallFragment":
-            case "WallVideosFragmentMosby":
+            case "WallVideosFragment":
                 return context.getString(R.string.fragment_wall);
-//            case "AlbumsFragment":
-            case "AlbumsFragmentMosby":
+            case "AlbumsFragment":
                 return context.getString(R.string.fragment_albums);
             default:
                 return context.getString(R.string.fragment_videos);

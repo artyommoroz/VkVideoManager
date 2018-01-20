@@ -1,4 +1,4 @@
-package com.frost.vkvideomanager.mosby;
+package com.frost.vkvideomanager.video.favorites;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -16,8 +16,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.mosby.presenter.FavoritesPresenter;
-import com.frost.vkvideomanager.mosby.view.FavoritesView;
 import com.frost.vkvideomanager.network.AdditionRequests;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
@@ -28,26 +26,23 @@ import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by frost on 14.10.16.
- */
 
-public class FavoritesFragmentMosby extends MvpLceViewStateFragment<SwipeRefreshLayout, VKList<VKApiVideo>, FavoritesView, FavoritesPresenter>
+public class FavoritesFragment extends MvpLceViewStateFragment<SwipeRefreshLayout, VKList<VKApiVideo>, FavoritesView, FavoritesPresenter>
         implements FavoritesView, SwipeRefreshLayout.OnRefreshListener, VideoAdapter.ItemClickListener {
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @Bind(R.id.noneItemsView)
+    @BindView(R.id.noneItemsView)
     TextView noneItemsView;
 
     private VideoAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    public static FavoritesFragmentMosby newInstance() {
-        return new FavoritesFragmentMosby();
+    public static FavoritesFragment newInstance() {
+        return new FavoritesFragment();
     }
 
     @Override
@@ -80,7 +75,6 @@ public class FavoritesFragmentMosby extends MvpLceViewStateFragment<SwipeRefresh
     public void onDestroyView() {
         super.onDestroyView();
         adapter = null;
-        ButterKnife.unbind(this);
     }
 
     @Override

@@ -1,8 +1,8 @@
-package com.frost.vkvideomanager.mosby.presenter;
+package com.frost.vkvideomanager.video;
 
-import com.frost.vkvideomanager.mosby.view.FavoritesView;
 import com.frost.vkvideomanager.network.Parser;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
+import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
@@ -11,21 +11,19 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
-/**
- * Created by frost on 14.10.16.
- */
 
-public class FavoritesPresenter extends MvpBasePresenter<FavoritesView> {
-
-    private static final String FAVORITES_REQUEST = "fave.getVideos";
+public class VideosPresenter extends MvpBasePresenter<VideosView> {
 
     private int offset;
     private VKList<VKApiVideo> videos = new VKList<>();
 
-    public void loadVideos(final boolean pullToRefresh) {
+    public void loadVideos(final boolean pullToRefresh, int ownerId, int albumId) {
         getView().showLoading(pullToRefresh);
         offset = 50;
-        VKRequest request = new VKRequest(FAVORITES_REQUEST, VKParameters.from(VKApiConst.COUNT, 50));
+        VKRequest request = VKApi.video().get(VKParameters.from(
+                VKApiConst.COUNT, 50,
+                VKApiConst.OWNER_ID, ownerId,
+                VKApiConst.ALBUM_ID, albumId));
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onError(VKError error) {
@@ -46,12 +44,12 @@ public class FavoritesPresenter extends MvpBasePresenter<FavoritesView> {
         });
     }
 
-    public void loadMoreVideos() {
-        VKRequest request = new VKRequest(FAVORITES_REQUEST, VKParameters.from(
-                VKApiConst.OFFSET, offset,
-                VKApiConst.COUNT, 50),
-                VKApiVideo.class
-        );
+    public void loadMoreVideos(int ownerId, int albumId) {
+        VKRequest request = VKApi.video().get(VKParameters.from(
+                VKApiConst.COUNT, 50,
+                VKApiConst.OWNER_ID, ownerId,
+                VKApiConst.ALBUM_ID, albumId,
+                VKApiConst.OFFSET, offset));
         offset += offset;
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -67,5 +65,21 @@ public class FavoritesPresenter extends MvpBasePresenter<FavoritesView> {
 
     public VKApiVideo getSelectedVideo(int position) {
         return videos.get(position);
+    }
+
+    public void deleteVideo(int position, int albumId) {
+        String ids = albumId == 0 ? "-1, -2" : String.valueOf(albumId);
+        VKRequest request = VKApi.video().removeFromAlbum(VKParameters.from(
+                VKApiConst.VIDEO_ID, videos.get(position).id,
+                VKApiConst.OWNER_ID, videos.get(position).owner_id,
+                VKApiConst.ALBUM_IDS, ids));
+        request.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                super.onComplete(response);
+                getView().videoDeleted(position, videos.get(position).title);
+                videos.remove(position);
+            }
+        });
     }
 }

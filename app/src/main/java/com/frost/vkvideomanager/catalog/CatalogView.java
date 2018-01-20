@@ -1,6 +1,5 @@
-package com.frost.vkvideomanager.mosby.view;
+package com.frost.vkvideomanager.catalog;
 
-import com.frost.vkvideomanager.catalog.CatalogSection;
 import com.hannesdorfmann.mosby.mvp.lce.MvpLceView;
 
 import java.util.List;

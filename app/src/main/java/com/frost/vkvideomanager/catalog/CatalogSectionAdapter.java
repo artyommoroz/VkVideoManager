@@ -1,9 +1,7 @@
 package com.frost.vkvideomanager.catalog;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -13,8 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.MainActivity;
+import com.frost.vkvideomanager.R;
 import com.frost.vkvideomanager.community.CommunityActivity;
 import com.frost.vkvideomanager.network.AdditionRequests;
 import com.frost.vkvideomanager.player.UrlHelper;
@@ -29,10 +27,9 @@ import com.vk.sdk.api.VKResponse;
 import com.vk.sdk.api.model.VKApiVideo;
 import com.vk.sdk.api.model.VKList;
 
-
 import java.util.Locale;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
@@ -41,7 +38,6 @@ public class CatalogSectionAdapter extends StatelessSection {
 
     private CatalogSection catalogSection;
     private Context context;
-//    private VKList<VKApiVideo> videoList;
     private VKApiVideo video;
     private boolean expanded;
 
@@ -64,7 +60,6 @@ public class CatalogSectionAdapter extends StatelessSection {
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, final int position) {
         ItemViewHolder itemHolder = (ItemViewHolder) holder;
-//        videoList = catalogSection.getVideoList();
         if (catalogSection.getVideoList().size() > 1) {
             video = catalogSection.getVideoList().get(position);
         }
@@ -170,17 +165,17 @@ public class CatalogSectionAdapter extends StatelessSection {
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.rootView)
+        @BindView(R.id.rootView)
         RelativeLayout rootView;
-        @Bind(R.id.title)
+        @BindView(R.id.title)
         TextView title;
-        @Bind(R.id.views)
+        @BindView(R.id.views)
         TextView views;
-        @Bind(R.id.duration)
+        @BindView(R.id.duration)
         TextView duration;
-        @Bind(R.id.imageVideo)
+        @BindView(R.id.imageVideo)
         ImageView imageVideo;
-        @Bind(R.id.moreButton)
+        @BindView(R.id.moreButton)
         ImageButton moreButton;
 
         public ItemViewHolder(View itemView) {
@@ -191,9 +186,9 @@ public class CatalogSectionAdapter extends StatelessSection {
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.icon)
+        @BindView(R.id.icon)
         ImageButton icon;
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
 
         public HeaderViewHolder(View itemView) {
@@ -204,11 +199,11 @@ public class CatalogSectionAdapter extends StatelessSection {
 
     class FooterViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.footerText)
+        @BindView(R.id.footerText)
         TextView footerText;
-        @Bind(R.id.expandButton)
+        @BindView(R.id.expandButton)
         ImageView expandButton;
-        @Bind(R.id.rootView)
+        @BindView(R.id.rootView)
         LinearLayout rootView;
 
         public FooterViewHolder(View itemView) {

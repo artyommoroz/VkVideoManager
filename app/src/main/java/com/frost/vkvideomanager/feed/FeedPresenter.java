@@ -1,8 +1,5 @@
-package com.frost.vkvideomanager.mosby.presenter;
+package com.frost.vkvideomanager.feed;
 
-import com.frost.vkvideomanager.feed.FeedSectionModel;
-import com.frost.vkvideomanager.feed.FeedSection;
-import com.frost.vkvideomanager.mosby.view.FeedView;
 import com.frost.vkvideomanager.network.Parser;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.vk.sdk.api.VKApiConst;

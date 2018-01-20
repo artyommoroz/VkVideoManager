@@ -14,7 +14,7 @@ import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.model.VKApiCommunity;
 import com.vk.sdk.api.model.VKList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -63,9 +63,9 @@ public class CommunityAdapter extends RecyclerView.Adapter<CommunityAdapter.Comm
 
     public class CommunityViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
-        @Bind(R.id.icon)
+        @BindView(R.id.icon)
         ImageView icon;
 
         public CommunityViewHolder(View itemView) {

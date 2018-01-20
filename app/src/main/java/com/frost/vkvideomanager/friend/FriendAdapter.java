@@ -14,7 +14,7 @@ import com.squareup.picasso.Picasso;
 import com.vk.sdk.api.model.VKApiUser;
 import com.vk.sdk.api.model.VKList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -23,12 +23,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     private VKList<VKApiUser> friends;
     private Context context;
     private ItemClickListener itemClickListener;
-
-    public FriendAdapter(Context context, VKList<VKApiUser> friends, ItemClickListener itemClickListener) {
-        this.context = context;
-        this.friends = friends;
-        this.itemClickListener = itemClickListener;
-    }
 
     public FriendAdapter(Context context, ItemClickListener itemClickListener) {
         this.context = context;
@@ -65,9 +59,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     public class FriendViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.name)
+        @BindView(R.id.name)
         TextView name;
-        @Bind(R.id.icon)
+        @BindView(R.id.icon)
         ImageView avatar;
 
         public FriendViewHolder(View itemView) {

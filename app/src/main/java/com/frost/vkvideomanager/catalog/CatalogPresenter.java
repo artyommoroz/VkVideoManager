@@ -1,9 +1,5 @@
-package com.frost.vkvideomanager.mosby.presenter;
+package com.frost.vkvideomanager.catalog;
 
-import com.frost.vkvideomanager.catalog.CatalogSection;
-import com.frost.vkvideomanager.catalog.CatalogSectionAdapter;
-import com.frost.vkvideomanager.feed.FeedSectionModel;
-import com.frost.vkvideomanager.mosby.view.CatalogView;
 import com.frost.vkvideomanager.network.Parser;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.vk.sdk.api.VKApiConst;
@@ -17,11 +13,6 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
-
-/**
- * Created by frost on 24.10.16.
- */
 
 public class CatalogPresenter extends MvpBasePresenter<CatalogView> {
 

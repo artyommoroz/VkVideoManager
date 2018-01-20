@@ -1,6 +1,5 @@
-package com.frost.vkvideomanager.mosby.presenter;
+package com.frost.vkvideomanager.community;
 
-import com.frost.vkvideomanager.mosby.view.FriendsView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKApiConst;
@@ -8,20 +7,20 @@ import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKParameters;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
-import com.vk.sdk.api.model.VKApiUser;
+import com.vk.sdk.api.model.VKApiCommunity;
 import com.vk.sdk.api.model.VKList;
 
 
-public class FriendsPresenter extends MvpBasePresenter<FriendsView> {
+public class CommunitiesPresenter extends MvpBasePresenter<CommunitiesView> {
 
-    private VKList<VKApiUser> friends;
+    private VKList<VKApiCommunity> communities;
 
-    public void loadFriends(final boolean pullToRefresh) {
+    public void loadCommunities(final boolean pullToRefresh) {
         getView().showLoading(pullToRefresh);
-        VKRequest request = VKApi.friends().get(VKParameters.from(
+
+        VKRequest request = VKApi.groups().get(VKParameters.from(
                 VKApiConst.COUNT, 1000,
-                VKApiConst.ORDER, "hints",
-                VKApiConst.FIELDS, "photo_100"
+                VKApiConst.EXTENDED, 1
         ));
         request.executeWithListener(new VKRequest.VKRequestListener() {
             @Override
@@ -35,20 +34,22 @@ public class FriendsPresenter extends MvpBasePresenter<FriendsView> {
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
                 if (isViewAttached()) {
-                    friends = new VKList<>();
-                    int friendsCount = ((VKList<VKApiUser>) response.parsedModel).getCount();
+                    communities = new VKList<>();
+                    int friendsCount = ((VKList<VKApiCommunity>) response.parsedModel).getCount();
                     for (int i = 0; i < friendsCount; i++) {
-                        VKApiUser friend = ((VKList<VKApiUser>) response.parsedModel).get(i);
-                        friends.add(friend);
+                        VKApiCommunity community = ((VKList<VKApiCommunity>) response.parsedModel).get(i);
+                        communities.add(community);
                     }
-                    getView().setData(friends);
+                    getView().setData(communities);
                     getView().showContent();
                 }
             }
         });
     }
 
-    public VKApiUser getSelectedFriend(int position) {
-        return friends.get(position);
+    public VKApiCommunity getSelectedFriend(int position) {
+        return communities.get(position);
     }
+
+
 }

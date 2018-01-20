@@ -1,4 +1,4 @@
-package com.frost.vkvideomanager.mosby;
+package com.frost.vkvideomanager.wall;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,32 +14,25 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.frost.vkvideomanager.R;
-import com.frost.vkvideomanager.mosby.presenter.WallVideosPresenter;
-import com.frost.vkvideomanager.mosby.view.WallVideosView;
 import com.frost.vkvideomanager.network.AdditionRequests;
 import com.frost.vkvideomanager.player.UrlHelper;
 import com.frost.vkvideomanager.utils.EndlessScrollListener;
-import com.frost.vkvideomanager.wall.WallVideo;
-import com.frost.vkvideomanager.wall.WallVideoAdapter;
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.LceViewState;
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.MvpLceViewStateFragment;
 import com.hannesdorfmann.mosby.mvp.viewstate.lce.data.RetainingLceViewState;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by frost on 16.10.16.
- */
 
-public class WallVideosFragmentMosby extends MvpLceViewStateFragment<SwipeRefreshLayout, List<WallVideo>, WallVideosView, WallVideosPresenter>
+public class WallVideosFragment extends MvpLceViewStateFragment<SwipeRefreshLayout, List<WallVideo>, WallVideosView, WallVideosPresenter>
         implements WallVideosView, SwipeRefreshLayout.OnRefreshListener, WallVideoAdapter.ItemClickListener {
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @Bind(R.id.noneItemsView)
+    @BindView(R.id.noneItemsView)
     TextView noneItemsView;
 
     private static final String OWNER_ID = "ownerId";
@@ -48,8 +41,8 @@ public class WallVideosFragmentMosby extends MvpLceViewStateFragment<SwipeRefres
     private LinearLayoutManager layoutManager;
     private int ownerId;
 
-    public static WallVideosFragmentMosby newInstance(int ownerId) {
-        WallVideosFragmentMosby fragment = new WallVideosFragmentMosby();
+    public static WallVideosFragment newInstance(int ownerId) {
+        WallVideosFragment fragment = new WallVideosFragment();
         Bundle args = new Bundle();
         args.putInt(OWNER_ID, ownerId);
         fragment.setArguments(args);
@@ -82,11 +75,6 @@ public class WallVideosFragmentMosby extends MvpLceViewStateFragment<SwipeRefres
         adapter = new WallVideoAdapter(getActivity(), this);
         recyclerView.setAdapter(adapter);
 
-//        int orientation = getActivity().getResources().getConfiguration().orientation;
-//        layoutManager = orientation == Configuration.ORIENTATION_PORTRAIT ?
-//                new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2);
-//        recyclerView.setLayoutManager(layoutManager);
-
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         setScrollListener(layoutManager);
@@ -98,7 +86,7 @@ public class WallVideosFragmentMosby extends MvpLceViewStateFragment<SwipeRefres
     public void onDestroyView() {
         super.onDestroyView();
         adapter = null;
-        ButterKnife.unbind(this);
+
     }
 
     @Override
@@ -198,6 +186,4 @@ public class WallVideosFragmentMosby extends MvpLceViewStateFragment<SwipeRefres
     public void playWallVideo(String wallVideoUrl) {
         UrlHelper.playVideo(getActivity(), wallVideoUrl);
     }
-
-
 }
